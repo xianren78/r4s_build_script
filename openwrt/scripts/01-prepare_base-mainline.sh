@@ -36,9 +36,9 @@ grep HASH include/kernel-6.6 | awk -F'HASH-' '{print $2}' | awk '{print $1}' | m
 # kernel generic patches
 rm -rf target/linux/generic
 kernel_version=$(sed -n 's/^LINUX_KERNEL_HASH-\([0-9.]\+\) = .*/\1/p' include/kernel-6.6)
-release_kernel_version=$(curl -sL https://raw.githubusercontent.com/sbwml/r4s_build_script/master/tags/kernel-6.6 | sed -n 's/^LINUX_KERNEL_HASH-\([0-9.]\+\) = .*/\1/p')
+release_kernel_version=$(curl -sL https://raw.githubusercontent.com/xianren78/r4s_build_script/master/tags/kernel-6.6 | sed -n 's/^LINUX_KERNEL_HASH-\([0-9.]\+\) = .*/\1/p')
 if [ "$kernel_version" = "$release_kernel_version" ]; then
-    git clone https://$github/sbwml/target_linux_generic -b main target/linux/generic --depth=1
+    git clone https://$github/xianren78/target_linux_generic -b 6.6.43 target/linux/generic --depth=1
 else
     if [ "$(whoami)" = "runner" ]; then
         git_name=private
