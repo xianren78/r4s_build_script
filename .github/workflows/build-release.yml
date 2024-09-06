@@ -1,4 +1,4 @@
-name: Build releases
+name: Build 6.6.43
 
 on:
   workflow_dispatch:
@@ -125,7 +125,7 @@ jobs:
       with:
         name: OpenWrt-${{ env.latest_release }}
         allowUpdates: true
-        tag: ${{ env.latest_release }}
+        tag: ${{ env.latest_release }}_6.6.43
         commit: master
         replacesArtifacts: true
         token: ${{ secrets.GITHUB_TOKEN }}
