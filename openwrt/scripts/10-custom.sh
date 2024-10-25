@@ -7,7 +7,7 @@ curl -s https://$github/xianren78/target_linux_generic/raw/358ab29d54b004fc3abff
 rm -f target/linux/generic/backport-6.6/611-01-v6.11-udp-Allow-GSO-transmit-from-devices-with-no-checksum.patch
 rm -f target/linux/generic/backport-6.6/611-03-v6.11-udp-Fall-back-to-software-USO-if-IPv6-extension-head.patch
 curl -s https://$github/xianren78/target_linux_generic/raw/3a2c8cb4422aec00a592f45c3887d05f55f086a5/backport-6.6/611-01-v6.11-udp-Allow-GSO-transmit-from-devices-with-no-checksum.patch > target/linux/generic/backport-6.6/611-03-v6.11-udp-Fall-back-to-software-USO-if-IPv6-extension-head.patch
-curl -s https://github.com/xianren78/target_linux_generic/raw/refs/heads/main/backport-6.6/900-v6.12-net-udp-Compute-L4-checksum-as-usual-when-not-segmenting-the-skb.patch > target/linux/generic/backport-6.6/900-v6.12-net-udp-Compute-L4-checksum-as-usual-when-not-segmenting-the-skb.patch
+curl -s https://$github/xianren78/target_linux_generic/raw/refs/heads/main/backport-6.6/900-v6.12-net-udp-Compute-L4-checksum-as-usual-when-not-segmenting-the-skb.patch > target/linux/generic/backport-6.6/900-v6.12-net-udp-Compute-L4-checksum-as-usual-when-not-segmenting-the-skb.patch
 
 # fallback uboot-rockchip version
 if [ "$platform" = "rk3568" ]; then
@@ -29,6 +29,9 @@ git clone https://$github/pmkol/luci-app-qosmate package/new/luci-app-qosmate --
 
 # add luci-app-tailscale
 git clone https://$github/asvow/luci-app-tailscale package/new/luci-app-tailscale --depth 1
+rm -rf feeds/packages/net/tailscale
+cp -a ../master/packages/net/tailscale feeds/packages/net/tailscale
+sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' feeds/packages/net/tailscale/Makefile
 
 # add luci-app-upnp
 rm -rf feeds/luci/applications/luci-app-upnp
@@ -46,13 +49,10 @@ git clone https://$github/morytyann/OpenWrt-mihomo package/new/openwrt-mihomo
 if [ "$MINIMAL_BUILD" = "y" ]; then
     if curl -s "https://$mirror/openwrt/23-config-minimal-common" | grep -q "^CONFIG_PACKAGE_luci-app-mihomo=y"; then
         mkdir -p files/etc/mihomo/run/ui
-        curl -Lso files/etc/mihomo/run/GeoSite.dat https://$github/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat
-        curl -Lso files/etc/mihomo/run/GeoIP.dat https://$github/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat
-        curl -Lso files/etc/mihomo/run/geoip.metadb https://$github/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.metadb
-        curl -Lso metacubexd-1.151.0.tar.gz https://$github/MetaCubeX/metacubexd/archive/refs/tags/v1.151.0.tar.gz
-        tar zxf metacubexd-1.151.0.tar.gz
-        rm metacubexd-1.151.0.tar.gz
-        mv metacubexd-1.151.0 files/etc/mihomo/run/ui/metacubexd
+        curl -Lso metacubexd-gh-pages.zip https://$github/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip
+        unzip metacubexd-gh-pages.zip
+        rm metacubexd-gh-pages.zip
+        mv metacubexd-gh-pages files/etc/mihomo/run/ui/metacubexd
     fi
 else
     if curl -s "https://$mirror/openwrt/23-config-common" | grep -q "^CONFIG_PACKAGE_luci-app-mihomo=y"; then 
