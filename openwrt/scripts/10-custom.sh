@@ -2,6 +2,11 @@
 
 # 自定义脚本
 
+# udp fallback to 6.6.43
+curl -s https://$github/xianren78/target_linux_generic/raw/refs/heads/main/hack-6.6/999-udp_offload-backto-43.patch > target/linux/generic/hack-6.6/999-udp_offload-backto-43.patch
+rm -rf target/linux/generic/‎backport-6.6/611-01-v6.11-udp-Allow-GSO-transmit-from-devices-with-no-checksum.patch	
+rm -rf target/linux/generic/‎backport-6.6/611-03-v6.11-udp-Fall-back-to-software-USO-if-IPv6-extension-head.patch
+curl -s https://$github/xianren78/target_linux_generic/raw/refs/heads/main/backport-6.6/611-01-v6.11-udp-Allow-GSO-transmit-from-devices-with-no-checksum.patch > target/linux/generic/backport-6.6/611-01-v6.11-udp-Allow-GSO-transmit-from-devices-with-no-checksum.patch
 curl -s https://$github/xianren78/target_linux_generic/raw/refs/heads/main/backport-6.6/900-v6.12-net-udp-Compute-L4-checksum-as-usual-when-not-segmenting-the-skb.patch > target/linux/generic/backport-6.6/900-v6.12-net-udp-Compute-L4-checksum-as-usual-when-not-segmenting-the-skb.patch
 
 # fallback uboot-rockchip version
