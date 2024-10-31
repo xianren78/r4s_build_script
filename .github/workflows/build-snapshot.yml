@@ -3,6 +3,7 @@ name: Build snapshot
 on: 
   schedule:
     - cron: '0 20 * * *'  # Runs at 4:00 AM Beijing Time (20:00 UTC)
+  workflow_dispatch:
 
 jobs:
   build:
