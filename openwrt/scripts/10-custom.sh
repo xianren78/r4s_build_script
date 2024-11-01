@@ -6,6 +6,7 @@
 if [ "$version" = "rc2" ]; then
     #curl -s https://$github/xianren78/target_linux_generic/raw/refs/heads/main/hack-6.6/999-udp_offload-backto-43.patch > target/linux/generic/hack-6.6/999-udp_offload-backto-43.patch
     rm -rf target/linux/generic/backport-6.6/611-03-v6.11-udp-Fall-back-to-software-USO-if-IPv6-extension-head.patch
+    curl -s https://$github/xianren78/target_linux_generic/raw/refs/heads/main/backport-6.6/999-rm-v6.11-udp-Fall-back-to-software-USO-if-IPv6-extension-head.patch > target/linux/generic/backport-6.6/999-rm-v6.11-udp-Fall-back-to-software-USO-if-IPv6-extension-head.patch
     curl -s https://$github/xianren78/target_linux_generic/raw/refs/heads/main/backport-6.6/900-v6.12-net-udp-Compute-L4-checksum-as-usual-when-not-segmenting-the-skb.patch > target/linux/generic/backport-6.6/900-v6.12-net-udp-Compute-L4-checksum-as-usual-when-not-segmenting-the-skb.patch
 fi
 
