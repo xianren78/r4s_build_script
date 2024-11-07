@@ -108,13 +108,13 @@ fi
 
 # gcc14 & 15
 if [ "$USE_GCC13" = y ]; then
-    export USE_GCC14=y gcc_version=13
+    export USE_GCC13=y gcc_version=13
 elif [ "$USE_GCC14" = y ]; then
     export USE_GCC14=y gcc_version=14
 elif [ "$USE_GCC15" = y ]; then
     export USE_GCC15=y gcc_version=15
 else
-    export gcc_version=13
+    export USE_GCC13=y gcc_version=13
 fi
 [ "$ENABLE_MOLD" = y ] && export ENABLE_MOLD=y
 
@@ -331,8 +331,8 @@ if [ "$ENABLE_LOCAL_KMOD" = "y" ]; then
 fi
 
 # gcc15 patches
+[ "$(whoami)" = "runner" ] && group "patching toolchain"
 curl -s https://$mirror/openwrt/patch/generic-24.10/202-toolchain-gcc-add-support-for-GCC-15.patch | patch -p1
-
 # gcc config
 [ "$USE_GCC13" = "y" ] && curl -s https://$mirror/openwrt/generic/config-gcc13 >> .config
 [ "$USE_GCC14" = "y" ] && curl -s https://$mirror/openwrt/generic/config-gcc14 >> .config
@@ -355,7 +355,7 @@ if [ "$BUILD_FAST" = "y" ]; then
     if [ "$PLATFORM_ID" = "platform:el9" ]; then
         TOOLCHAIN_URL="http://127.0.0.1:8080"
     else
-        TOOLCHAIN_URL=https://"$github_proxy"github.com/sbwml/openwrt_caches/releases/download/${openwrt_version}
+        TOOLCHAIN_URL=https://"$github_proxy"github.com/sbwml/openwrt_caches/releases/download/openwrt-24.10
     fi
     curl -L ${TOOLCHAIN_URL}/toolchain_${LIBC}_${toolchain_arch}_gcc-${gcc_version}.tar.zst -o toolchain.tar.zst $CURL_BAR
     echo -e "\n${GREEN_COLOR}Process Toolchain ...${RES}"
@@ -419,6 +419,8 @@ if [ "$platform" = "x86_64" ]; then
         # driver firmware
         cp -a bin/packages/x86_64/base/*firmware*.ipk $kmodpkg_name/
         cp -a bin/packages/x86_64/base/*natflow*.ipk $kmodpkg_name/
+        cp -a bin/packages/x86_64/base/*dpdk*.ipk $kmodpkg_name/ || true
+        cp -a bin/packages/x86_64/base/*numa*.ipk $kmodpkg_name/ || true
         bash kmod-sign $kmodpkg_name
         tar zcf x86_64-$kmodpkg_name.tar.gz $kmodpkg_name
         rm -rf $kmodpkg_name
@@ -458,6 +460,8 @@ elif [ "$platform" = "armv8" ]; then
         # driver firmware
         cp -a bin/packages/aarch64_generic/base/*firmware*.ipk $kmodpkg_name/
         cp -a bin/packages/aarch64_generic/base/*natflow*.ipk $kmodpkg_name/
+        cp -a bin/packages/aarch64_generic/base/*dpdk*.ipk $kmodpkg_name/ || true
+        cp -a bin/packages/aarch64_generic/base/*numa*.ipk $kmodpkg_name/ || true
         bash kmod-sign $kmodpkg_name
         tar zcf armv8-$kmodpkg_name.tar.gz $kmodpkg_name
         rm -rf $kmodpkg_name
@@ -521,6 +525,8 @@ else
         # driver firmware
         cp -a bin/packages/aarch64_generic/base/*firmware*.ipk $kmodpkg_name/
         cp -a bin/packages/aarch64_generic/base/*natflow*.ipk $kmodpkg_name/
+        cp -a bin/packages/aarch64_generic/base/*dpdk*.ipk $kmodpkg_name/ || true
+        cp -a bin/packages/aarch64_generic/base/*numa*.ipk $kmodpkg_name/ || true
         bash kmod-sign $kmodpkg_name
         tar zcf aarch64-$kmodpkg_name.tar.gz $kmodpkg_name
         rm -rf $kmodpkg_name
