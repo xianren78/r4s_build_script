@@ -3,6 +3,7 @@ on:
   # 定时触发 - 每天凌晨 4:00 北京时间
   schedule:
     - cron: '0 20 * * *'  # UTC 时间为每天 20:00，对应北京时间 04:00
+  workflow_dispatch:
 
 jobs:
   build:
