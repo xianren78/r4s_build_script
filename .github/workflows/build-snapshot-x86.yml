@@ -1,13 +1,12 @@
-name: Build snapshot
-
-on: 
+name: Scheduled Build Releases X86
+on:
+  # 定时触发 - 每天凌晨 4:00 北京时间
   schedule:
-    - cron: '0 20 * * *'  # Runs at 4:00 AM Beijing Time (20:00 UTC)
-  workflow_dispatch:
+    - cron: '0 20 * * *'  # UTC 时间为每天 20:00，对应北京时间 04:00
 
 jobs:
   build:
-    name: Build snapshot for X86_64
+    name: Scheduled Build x86_64
     runs-on: ubuntu-24.04
     defaults:
       run:
@@ -15,13 +14,18 @@ jobs:
 
     steps:
     - name: Setup variables
-      run: |
+      run: | 
         sudo timedatectl set-timezone 'Asia/Shanghai'
         git config --global user.name 'actions'
         git config --global user.email 'action@github.com'
-        echo WORKDIR="/builder" >> "$GITHUB_ENV"
-        echo build_version="dev" >> "$GITHUB_ENV"  # Set to snapshot version
-
+        echo build_dir="/builder" >> "$GITHUB_ENV"
+        echo build_version="dev" >> "$GITHUB_ENV"
+        echo device="x86_64" >> "$GITHUB_ENV"
+        echo version="snapshot-24.10" >> "$GITHUB_ENV"
+        echo ccache="true" >> "$GITHUB_ENV"
+        echo lan_addr="10.0.0.1" >> "$GITHUB_ENV"
+        echo build_options="BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y ENABLE_MOLD=y KERNEL_CLANG_LTO=y" >> "$GITHUB_ENV"
+    
     - name: Show system
       run: |
         echo -e "\n\e[1;32mCPU:\e[0m"
@@ -47,18 +51,24 @@ jobs:
     - name: Install LLVM
       uses: sbwml/actions@install-llvm
 
+    - name: Restore Cached
+      if: env.ccache == 'true'
+      uses: actions/cache/restore@v4
+      with:
+        path: /builder/.ccache
+        key: openwrt-${{ env.version }}-${{ env.device }}-ccache
+
     - name: Compile OpenWrt
       working-directory: /builder
       id: compile
       continue-on-error: true
       run: |
         export GITHUB_REPO=${{ github.repository }}
-        export BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y ENABLE_MOLD=y KERNEL_CLANG_LTO=y USE_GCC14=y  # Default build options
-        bash <(curl -sS https://raw.githubusercontent.com/${{ github.repository }}/master/openwrt/build.sh) ${{ env.build_version }} x86_64
+        export ${{ env.build_options }} LAN=${{ env.lan_addr }} USE_GCC15=y ENABLE_CCACHE=${{ env.ccache }}
+        bash <(curl -sS https://raw.githubusercontent.com/${{ github.repository }}/master/openwrt/build.sh) ${{ env.build_version }} ${{ env.device }}
         cd openwrt
-        tags=snapshot-24.10-$(git log -n 1 --date=format:"%Y%m%d" --format="%cd")-$(git log --pretty=format:"%h" -1)
-        kernel=$(curl -s "https://raw.githubusercontent.com/${{ github.repository }}/master/tags/kernel-6.12" | awk -F"LINUX_KERNEL_HASH-| =" '/LINUX_KERNEL_HASH/{print $2}')
-        echo "latest_release=$tags-k$kernel" >>$GITHUB_ENV
+        tags=${{ env.version }}-$(git log -n 1 --date=format:"%Y%m%d" --format="%cd")-$(git log --pretty=format:"%h" -1)
+        echo "latest_release=$tags" >>$GITHUB_ENV
 
     - name: Extensive logs after a failed compilation
       working-directory: /builder
@@ -66,6 +76,13 @@ jobs:
       run: |
         cd openwrt
         make V=s
+
+    - name: Save Cached
+      if: env.ccache == 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: /builder/.ccache
+        key: openwrt-${{ env.version }}-${{ env.device }}-ccache
 
     - name: Prepare Firmware Files
       working-directory: /builder
@@ -82,7 +99,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: x86_64-openwrt-${{ env.latest_release }}
-        path: ${{ env.WORKDIR }}/rom/*
+        path: ${{ env.build_dir }}/rom/*
 
     - name: Create release
       continue-on-error: true
@@ -94,4 +111,4 @@ jobs:
         commit: master
         replacesArtifacts: true
         token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: ${{ env.WORKDIR }}/rom/*
+        artifacts: ${{ env.build_dir }}/rom/*
