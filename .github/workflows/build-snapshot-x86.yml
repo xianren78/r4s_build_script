@@ -1,8 +1,8 @@
 name: Scheduled Build Releases X86
 on:
-  # ¶¨Ê±´¥·¢ - Ã¿ÌìÁè³¿ 4:00 ±±¾©Ê±¼ä
+  # å®šæ—¶è§¦å‘ - æ¯å¤©å‡Œæ™¨ 4:00 åŒ—äº¬æ—¶é—´
   schedule:
-    - cron: '0 20 * * *'  # UTC Ê±¼äÎªÃ¿Ìì 20:00£¬¶ÔÓ¦±±¾©Ê±¼ä 04:00
+    - cron: '0 20 * * *'  # UTC æ—¶é—´ä¸ºæ¯å¤© 20:00ï¼Œå¯¹åº”åŒ—äº¬æ—¶é—´ 04:00
 
 jobs:
   build:
@@ -56,7 +56,7 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: /builder/.ccache
-        key: openwrt-${{ env.version }}-${{ env.device }}-ccache
+        key: openwrt-24.10-${{ env.device }}-ccache
 
     - name: Compile OpenWrt
       working-directory: /builder
