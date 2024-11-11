@@ -1,0 +1,119 @@
+name: Build openwrt x86_64 nightly
+
+on:
+  # 定时触发 - 每天凌晨 4:00 北京时间
+  schedule:
+    - cron: '0 20 * * *'  # UTC 时间为每天 20:00，对应北京时间 04:00
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build x86_64
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Setup variables
+      run: |
+        sudo timedatectl set-timezone 'Asia/Shanghai'
+        git config --global user.name 'actions'
+        git config --global user.email 'action@github.com'
+        echo build_dir="/builder" >> "$GITHUB_ENV"
+        echo build_version="dev" >> "$GITHUB_ENV"
+
+    - name: Show system
+      run: |
+        echo -e "\n\e[1;32mCPU:\e[0m"
+        echo "$(grep 'model name' /proc/cpuinfo | head -1 | awk -F ': ' '{print $2}') ($(grep 'cpu MHz' /proc/cpuinfo | head -1 | awk -F ': ' '{print $2}')MHz) x $(grep processor /proc/cpuinfo  | wc -l)"
+        echo -e "\n\e[1;32mMemory:\e[0m"
+        free -h
+        echo -e "\n\e[1;32mStorage:\e[0m"
+        df -Th / /mnt
+        echo -e "\n\e[1;32mSystem:\e[0m"
+        lsb_release -a
+        echo -e "\n\e[1;32mKernel:\e[0m"
+        uname -a
+        echo
+
+    - name: Free disk space
+      uses: sbwml/actions@free-disk
+      with:
+        build-mount-path: /builder
+
+    - name: Build System Setup
+      uses: sbwml/actions@openwrt-build-setup
+
+    - name: Install LLVM
+      uses: sbwml/actions@install-llvm
+
+    - name: Restore Cached
+      uses: actions/cache/restore@v4
+      with:
+        path: /builder/.ccache
+        key: openwrt-24.10-x86_64-ccache
+
+    - name: Compile OpenWrt
+      working-directory: /builder
+      id: compile
+      continue-on-error: true
+      run: |
+        export GITHUB_REPO=${{ github.repository }}
+        export BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y ENABLE_MOLD=y KERNEL_CLANG_LTO=y LAN=10.0.0.1 USE_GCC15=y ENABLE_CCACHE=y
+        bash <(curl -sS https://raw.githubusercontent.com/${{ github.repository }}/master/openwrt/build.sh) ${{ env.build_version }} x86_64
+        cd openwrt
+        tags=snapshot-24.10-$(git log -n 1 --date=format:"%Y%m%d" --format="%cd")-$(git log --pretty=format:"%h" -1)
+        echo "latest_release=$tags" >>$GITHUB_ENV
+
+    - name: Extensive logs after a failed compilation
+      working-directory: /builder
+      if: steps.compile.outcome == 'failure'
+      run: |
+        cd openwrt
+        make V=s
+
+    - name: Delete Cached
+      continue-on-error: true
+      working-directory: /builder
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_REPO: ${{ github.repository }}
+      run: |
+        gh cache delete openwrt-24.10-x86_64-ccache || true
+
+    - name: Save Cached
+      continue-on-error: true
+      uses: actions/cache/save@v4
+      with:
+        path: /builder/.ccache
+        key: openwrt-24.10-x86_64-ccache
+
+    - name: Prepare Firmware Files
+      working-directory: /builder
+      run: |
+        mkdir -p rom info
+        cp -a openwrt/bin/targets/x86/*/*-ext4-combined-efi.img.gz rom/
+        cp -a openwrt/bin/targets/x86/*/*-squashfs-combined-efi.img.gz rom/
+        cp -a openwrt/bin/targets/x86/*/*-generic-rootfs.tar.gz rom/
+        cp -a openwrt/bin/targets/x86/*/*-x86-64-generic.manifest info/manifest.txt
+        cp -a openwrt/bin/targets/x86/*/config.buildinfo info/config.buildinfo
+        cd rom && sha256sum *gz > ../info/sha256sums.txt
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: x86_64-openwrt-${{ env.latest_release }}
+        path: ${{ env.build_dir }}/rom/*
+
+    - name: Create release
+      continue-on-error: true
+      uses: ncipollo/release-action@v1
+      with:
+        name: ${{ env.latest_release }}
+        allowUpdates: true
+        tag: ${{ env.latest_release }}
+        commit: master
+        replacesArtifacts: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: ${{ env.build_dir }}/rom/*
