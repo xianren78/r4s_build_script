@@ -130,10 +130,10 @@ jobs:
         name: ccache
         allowUpdates: true
         tag: ccache
-        commit: main
+        commit: master
         replacesArtifacts: true
         prerelease: true
-        token: ${{ secrets.workflow_token }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: |
           ${{ env.build_dir }}/ccache/*
 
