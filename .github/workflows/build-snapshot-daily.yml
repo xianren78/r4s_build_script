@@ -72,14 +72,14 @@ jobs:
       uses: sbwml/actions@install-llvm
 
     - name: Restore Cached
-      if: ${{ matrix.model != 'armv8' }}
+      #if: ${{ matrix.model != 'armv8' }}
       uses: actions/cache/restore@v4
       with:
         path: /builder/.ccache
         key: ${{ matrix.tag.version }}-${{ matrix.model }}-ccache
 
     - name: Restore Cached (releases)
-      if: ${{ matrix.model == 'armv8' }}
+      if: ${{ matrix.model == 'armv8-test' }}
       continue-on-error: true
       working-directory: /builder
       run: |
@@ -113,7 +113,7 @@ jobs:
         make V=s IGNORE_ERRORS="n m"
 
     - name: Delete Cached
-      if: ${{ matrix.model != 'armv8' }}
+      #if: ${{ matrix.model != 'armv8' }}
       continue-on-error: true
       working-directory: /builder
       env:
@@ -123,14 +123,14 @@ jobs:
         gh cache delete ${{ matrix.tag.version }}-${{ matrix.model }}-ccache || true
 
     - name: Save Cached
-      if: ${{ matrix.model != 'armv8' }}
+      #if: ${{ matrix.model != 'armv8' }}
       uses: actions/cache/save@v4
       with:
         path: /builder/.ccache
         key: ${{ matrix.tag.version }}-${{ matrix.model }}-ccache
 
     - name: Create Ccache tar files
-      if: ${{ matrix.model == 'armv8' }}
+      if: ${{ matrix.model == 'armv8-test' }}
       continue-on-error: true
       working-directory: /builder
       run: |
@@ -138,7 +138,7 @@ jobs:
         tar cf - .ccache | split -d -b 1800m - ccache/${{ matrix.model }}.tar.
 
     - name: Save Cached (releases)
-      if: ${{ matrix.model == 'armv8' }}
+      if: ${{ matrix.model == 'armv8-test' }}
       continue-on-error: true
       uses: ncipollo/release-action@v1.14.0
       with:
