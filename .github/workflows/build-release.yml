@@ -25,7 +25,7 @@ on:
       ccache:
         description: 'Enable ccache (Use Cache to speed up next build)'
         type: boolean
-        default: false
+        default: true
       lan_addr:
         description: 'Setting default LAN address'
         required: true
@@ -96,14 +96,14 @@ jobs:
       uses: sbwml/actions@install-llvm
 
     - name: Restore Cached
-      if: ${{ github.event.inputs.ccache == 'true' && github.event.inputs.device != 'armv8' && github.event.inputs.device != 'nanopi-r4s' }}
+      if: ${{ github.event.inputs.ccache == 'true' }}
       uses: actions/cache/restore@v4
       with:
         path: /builder/.ccache
         key: openwrt-24.10-${{ github.event.inputs.device }}-ccache
 
     - name: Restore Cached (releases)
-      if: ${{ github.event.inputs.ccache == 'true' && github.event.inputs.device == 'armv8' || github.event.inputs.device == 'nanopi-r4s' }}
+      if: ${{ github.event.inputs.ccache == 'true' && github.event.inputs.device == 'armv8-test' }}
       continue-on-error: true
       working-directory: /builder
       run: |
@@ -140,7 +140,7 @@ jobs:
         make V=s
 
     - name: Delete Cached
-      if: ${{ github.event.inputs.ccache == 'true' && github.event.inputs.device != 'armv8' && github.event.inputs.device != 'nanopi-r4s' }}
+      if: ${{ github.event.inputs.ccache == 'true' }}
       continue-on-error: true
       working-directory: /builder
       env:
@@ -150,7 +150,7 @@ jobs:
         gh cache delete openwrt-24.10-${{ github.event.inputs.device }}-ccache || true
 
     - name: Save Cached
-      if: ${{ github.event.inputs.ccache == 'true' && github.event.inputs.device != 'armv8' && github.event.inputs.device != 'nanopi-r4s' }}
+      if: ${{ github.event.inputs.ccache == 'true' }}
       continue-on-error: true
       uses: actions/cache/save@v4
       with:
@@ -158,7 +158,7 @@ jobs:
         key: openwrt-24.10-${{ github.event.inputs.device }}-ccache
 
     - name: Create ccache tar files
-      if: ${{ github.event.inputs.ccache == 'true' && github.event.inputs.device == 'armv8' || github.event.inputs.device == 'nanopi-r4s' }}
+      if: ${{ github.event.inputs.ccache == 'true' && github.event.inputs.device == 'armv8-test' }}
       continue-on-error: true
       working-directory: /builder
       run: |
@@ -166,7 +166,7 @@ jobs:
         tar cf - .ccache | split -d -b 1800m - ccache/${{ github.event.inputs.device }}.tar.
 
     - name: Upload Cached (releases - ccache)
-      if: ${{ github.event.inputs.ccache == 'true' && github.event.inputs.device == 'armv8' || github.event.inputs.device == 'nanopi-r4s' }}
+      if: ${{ github.event.inputs.ccache == 'true' && github.event.inputs.device == 'armv8-test' }}
       continue-on-error: true
       uses: ncipollo/release-action@v1.14.0
       with:
