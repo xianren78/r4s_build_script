@@ -27,3 +27,7 @@ curl -Lso Razord-meta-gh-pages.zip https://$github/MetaCubeX/Razord-meta/archive
 unzip Razord-meta-gh-pages.zip
 mv Razord-meta-gh-pages files/etc/nikki/run/ui/dashboard
 rm Razord-meta-gh-pages.zip
+
+# inputrc
+touch files/root/.inputrc
+echo "set enable-bracketed-paste off" > files/root/.inputrc
