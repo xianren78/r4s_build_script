@@ -28,11 +28,6 @@ unzip Razord-meta-gh-pages.zip
 mv Razord-meta-gh-pages files/etc/nikki/run/ui/dashboard
 rm Razord-meta-gh-pages.zip
 
-# bash
-mkdir -p files/root
-curl -so files/root/.bash_profile https://raw.githubusercontent.com/xianren78/r4s_build_script/master/openwrt/files/root/.bash_profile
-curl -so files/root/.bashrc https://raw.githubusercontent.com/xianren78/r4s_build_script/master/openwrt/files/root/.bashrc
-
 # pubkey
 mkdir -p files/root/.ssh/
 touch  files/root/.ssh/authorized_keys
