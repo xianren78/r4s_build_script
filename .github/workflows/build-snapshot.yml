@@ -191,9 +191,9 @@ jobs:
       continue-on-error: true
       uses: ncipollo/release-action@v1
       with:
-        name: ${{ env.latest_release }}
+        name: ${{ env.latest_release }}-rm681
         allowUpdates: true
-        tag: ${{ env.latest_release }}
+        tag: ${{ env.latest_release }}-rm681
         commit: master
         replacesArtifacts: true
         token: ${{ secrets.GITHUB_TOKEN }}
