@@ -2,6 +2,10 @@
 
 # 自定义脚本
 
+# rm 600 patch
+rm -f target/linux/generic/hack-6.12/600-net-enable-fraglist-GRO-by-default.patch
+#rm -f target/linux/generic/pending-6.12/681-net-remove-NETIF_F_GSO_FRAGLIST-from-NETIF_F_GSO_SOF.patch
+
 # add openwrt-nikki
 rm -rf package/new/helloworld/luci-app-nikki
 rm -rf package/new/helloworld/nikki
