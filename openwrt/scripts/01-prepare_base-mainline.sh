@@ -46,7 +46,7 @@ fi
 
 # armsr/armv8
 rm -rf target/linux/armsr
-git clone https://nanopi:nanopi@$gitea/sbwml/target_linux_armsr target/linux/armsr -b main
+git clone https://$git_targetnew@$github/xianren78/target_linux_armsr target/linux/armsr -b main
 
 # kernel - 6.12
 curl -s $mirror/tags/kernel-6.12 > include/kernel-6.12
