@@ -2,6 +2,9 @@
 
 # 自定义脚本
 
+# add https://github.com/unifreq/linux-6.12.y/commit/efcda2e8870430b2db57e3a0da66a5ed4e2dd6d6 patch
+curl -Os  https://github.com/unifreq/linux-6.12.y/commit/efcda2e8870430b2db57e3a0da66a5ed4e2dd6d6.patch > target/linux/generic/hack-6.12/efcda2.patch
+
 # remove gro improvement patch
 rm -f target/linux/generic/hack-6.12/600-net-enable-fraglist-GRO-by-default.patch
 # according to https://github.com/coolsnowwolf/lede/issues/12331
