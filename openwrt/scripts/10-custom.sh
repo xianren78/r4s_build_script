@@ -7,6 +7,9 @@ rm -f target/linux/generic/hack-6.12/600-net-enable-fraglist-GRO-by-default.patc
 # according to https://github.com/coolsnowwolf/lede/issues/12331
 #rm -f target/linux/generic/pending-6.12/680-net-add-TCP-fraglist-GRO-support.patch 
 
+# remove mbedtls gcc15 patch after openwrt commit https://github.com/openwrt/openwrt/commit/53ab5629c31f3c7ca58cb48518d530c660ee0023
+rm -f package/libs/mbedtls/patches/901-tests-fix-string-initialization-error-on-gcc15.patch
+
 # add openwrt-nikki
 rm -rf package/new/helloworld/luci-app-nikki
 rm -rf package/new/helloworld/nikki
