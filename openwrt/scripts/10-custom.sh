@@ -15,9 +15,8 @@ rm -rf package/new/helloworld/luci-app-nikki
 rm -rf package/new/helloworld/nikki
 git clone https://$github/nikkinikki-org/OpenWrt-nikki package/new/OpenWrt-nikki
 
-mkdir -p files/etc/nikki/run/ui
-
 # Download and extract zashboard
+mkdir -p files/etc/nikki/run/ui/zashboard
 curl -Lso zashboard.zip https://$github/Zephyruso/zashboard/releases/latest/download/dist.zip
 unzip zashboard.zip
 mv dist/* dist/.* files/etc/nikki/run/ui/zashboard/ 2>/dev/null
@@ -26,12 +25,14 @@ rm zashboard.zip
 rm -rf files/etc/nikki/run/ui/metacubexd
 
 # Download and extract Yacd-meta-gh-pages
+mkdir -p files/etc/nikki/run/ui/yacd
 curl -Lso Yacd-meta-gh-pages.zip https://$github/MetaCubeX/Yacd-meta/archive/refs/heads/gh-pages.zip
 unzip Yacd-meta-gh-pages.zip
 mv Yacd-meta-gh-pages files/etc/nikki/run/ui/yacd
 rm Yacd-meta-gh-pages.zip
 
 # Download and extract Razord-meta-gh-pages
+mkdir -p files/etc/nikki/run/ui/dashboard
 curl -Lso Razord-meta-gh-pages.zip https://$github/MetaCubeX/Razord-meta/archive/refs/heads/gh-pages.zip
 unzip Razord-meta-gh-pages.zip
 mv Razord-meta-gh-pages files/etc/nikki/run/ui/dashboard
