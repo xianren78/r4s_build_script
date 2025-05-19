@@ -30,14 +30,14 @@ rm -rf files/etc/nikki/run/ui/metacubexd
 mkdir -p files/etc/nikki/run/ui/yacd
 curl -Lso Yacd-meta-gh-pages.zip https://$github/MetaCubeX/Yacd-meta/archive/refs/heads/gh-pages.zip
 unzip Yacd-meta-gh-pages.zip
-mv Yacd-meta-gh-pages files/etc/nikki/run/ui/yacd
+mv Yacd-meta-gh-pages/* files/etc/nikki/run/ui/yacd/
 rm Yacd-meta-gh-pages.zip
 
 # Download and extract Razord-meta-gh-pages
 mkdir -p files/etc/nikki/run/ui/dashboard
 curl -Lso Razord-meta-gh-pages.zip https://$github/MetaCubeX/Razord-meta/archive/refs/heads/gh-pages.zip
 unzip Razord-meta-gh-pages.zip
-mv Razord-meta-gh-pages files/etc/nikki/run/ui/dashboard
+mv Razord-meta-gh-pages/* files/etc/nikki/run/ui/dashboard/
 rm Razord-meta-gh-pages.zip
 
 # pubkey
