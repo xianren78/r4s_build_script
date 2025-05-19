@@ -9,6 +9,8 @@ rm -f target/linux/generic/hack-6.12/600-net-enable-fraglist-GRO-by-default.patc
 
 # https://github.com/openwrt/openwrt/commit/cee749b88975fcd2861df648ff98d399e41aa1ea
 rm -f target/linux/generic/pending-6.12/620-net_sched-codel-do-not-defer-queue-length-update.patch
+# https://git.cooluc.com/sbwml/target_linux_generic/commit/51e0565f724343f69f7642a28fea97c44d28d91b
+rm -f target/linux/generic/pending-6.12/730-net-ethernet-mtk_eth_soc-reset-all-TX-queues-on-DMA-.patch
 
 # add openwrt-nikki
 rm -rf package/new/helloworld/luci-app-nikki
