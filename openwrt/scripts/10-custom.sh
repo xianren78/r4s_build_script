@@ -19,7 +19,7 @@ git clone https://$github/nikkinikki-org/OpenWrt-nikki package/new/OpenWrt-nikki
 
 # Download and extract zashboard
 mkdir -p files/etc/nikki/run/ui/zashboard
-curl -Lso zashboard.zip https://$github/Zephyruso/zashboard/releases/latest/download/dist.zip
+curl -Lso zashboard.zip https://$github/Zephyruso/zashboard/releases/latest/download/dist-cdn-fonts.zip
 unzip zashboard.zip
 mv dist/* dist/.* files/etc/nikki/run/ui/zashboard/ 2>/dev/null
 rm zashboard.zip
