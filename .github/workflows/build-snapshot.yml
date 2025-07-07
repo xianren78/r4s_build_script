@@ -60,6 +60,7 @@ jobs:
             file_server browse
         }
         EOF
+        sudo /usr/bin/caddy fmt --overwrite caddyfile
         sudo /usr/bin/caddy start --config caddyfile --adapter caddyfile
 
     - name: Free disk space
