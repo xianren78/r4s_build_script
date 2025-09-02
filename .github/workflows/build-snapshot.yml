@@ -106,8 +106,10 @@ jobs:
       run: |
         export BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y ENABLE_MOLD=y KERNEL_CLANG_LTO=y LAN=192.168.0.3 USE_GCC15=y ENABLE_CCACHE=y
         bash <(curl -sS http://127.0.0.1:8080/build.sh) ${{ matrix.tag.type }} ${{ matrix.model }}
+        kver=$(curl -fsSL https://init.cooluc.com/tags/kernel-6.12 | sed -n 's/^LINUX_KERNEL_HASH-\([0-9.]\+\) *=.*/\1/p' | head -n1)
+        echo "kver=$kver"
         cd openwrt
-        tags=snapshot-24.10-$(git log -n 1 --date=format:"%Y%m%d" --format="%cd")-$(git log --pretty=format:"%h" -1)
+        tags=snapshot-24.10-$(git log -n 1 --date=format:"%Y%m%d" --format="%cd")-$(git log --pretty=format:"%h" -1)-$kver
         echo "latest_release=$tags" >>$GITHUB_ENV
         build_date=$(date "+%Y-%m-%d")
         echo "build_date=$build_date" >> $GITHUB_ENV
