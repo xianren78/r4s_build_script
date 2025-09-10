@@ -12,6 +12,7 @@ rm -f target/linux/generic/pending-6.12/620-net_sched-codel-do-not-defer-queue-l
 # https://git.cooluc.com/sbwml/target_linux_generic/commit/51e0565f724343f69f7642a28fea97c44d28d91b
 rm -f target/linux/generic/pending-6.12/730-net-ethernet-mtk_eth_soc-reset-all-TX-queues-on-DMA-.patch
 
+rm -f target/linux/generic/backport-6.12/600-01-v6.14-net-dsa-add-hook-to-determine-whether-EEE-is-support.patch
 rm -f feeds/packages/admin/htop/patches/001-Avoid-compilation-issues-with-ncurses-on-GCC-15.patch
 
 # add openwrt-nikki
