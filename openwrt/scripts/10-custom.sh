@@ -2,6 +2,9 @@
 
 # 自定义脚本
 
+# replace miniupnpd download domain
+sed -i 's/tuxfamily\.org/free.fr/g' feeds/packages/net/miniupnpd/Makefile
+
 # remove gro improvement patch
 rm -f target/linux/generic/hack-6.12/600-net-enable-fraglist-GRO-by-default.patch
 # according to https://github.com/coolsnowwolf/lede/issues/12331
