@@ -10,7 +10,8 @@ rm -rf target/linux/rockchip
 if [ "$(whoami)" = "sbwml" ]; then
     git clone https://$gitea/sbwml/target_linux_rockchip-6.x target/linux/rockchip -b openwrt-24.10
 else
-    git clone https://"$git_name":"$git_password"@$gitea/sbwml/target_linux_rockchip-6.x target/linux/rockchip -b openwrt-24.10
+    git clone https://$git_targetnew@$github/xianren78/target_linux_rockchip-6.x target/linux/rockchip -b openwrt-24.10
+#    git clone https://"$git_name":"$git_password"@$gitea/sbwml/target_linux_rockchip-6.x target/linux/rockchip -b openwrt-24.10
 fi
 
 # bpf-headers - 6.12
@@ -30,7 +31,7 @@ curl -s $mirror/openwrt/patch/openwrt-6.x/x86/base-files/etc/board.d/02_network 
 
 # armsr/armv8
 rm -rf target/linux/armsr
-git clone https://nanopi:nanopi@$gitea/sbwml/target_linux_armsr target/linux/armsr -b main
+git clone https://$git_targetnew@$github/xianren78/target_linux_armsr target/linux/armsr -b main
 
 # kernel - 6.12
 curl -s $mirror/tags/kernel-6.12 > include/kernel-6.12
@@ -49,7 +50,8 @@ else
     if [ "$(whoami)" = "sbwml" ]; then
         git clone https://$gitea/sbwml/target_linux_generic -b openwrt-24.10 target/linux/generic-6.12 --depth=1
     else
-        git clone https://"$git_name":"$git_password"@$gitea/sbwml/target_linux_generic -b openwrt-24.10 target/linux/generic-6.12 --depth=1
+ #       git clone https://"$git_name":"$git_password"@$gitea/sbwml/target_linux_generic -b openwrt-24.10 target/linux/generic-6.12 --depth=1
+        git clone https://$git_targetnew@$github/xianren78/target_linux_generic -b openwrt-24.10 target/linux/generic-6.12 --depth=1
     fi
 fi
 cp -a target/linux/generic-6.12/* target/linux/generic
