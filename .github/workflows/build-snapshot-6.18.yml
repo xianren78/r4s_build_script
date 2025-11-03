@@ -1,4 +1,4 @@
-name: Build Snapshot
+name: Build Snapshot Dev (6.18)
 
 on:
   workflow_dispatch:
@@ -85,7 +85,7 @@ jobs:
       run: |
         export BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y ENABLE_MOLD=y KERNEL_CLANG_LTO=y LAN=192.168.0.3 USE_GCC15=y ENABLE_CCACHE=y
         bash <(curl -sS https://init3.cooluc.com/build.sh) ${{ matrix.tag.type }} ${{ matrix.model }}
-        kver=$(curl -fsSL https://init3.cooluc.com/tags/kernel-6.18 | sed -n 's/^LINUX_KERNEL_HASH-\([0-9.]\+\) *=.*/\1/p' | head -n1)
+        kver=$(curl -fsSL https://init3.cooluc.com/tags/kernel-6.18 | sed -n 's/^LINUX_KERNEL_HASH-\([0-9A-Za-z.\-]\+\) *=.*/\1/p' | head -n1)
         echo "kver=$kver"
         cd openwrt
         tags=snapshot-24.10-$(git log -n 1 --date=format:"%Y%m%d" --format="%cd")-$(git log --pretty=format:"%h" -1)-$kver
