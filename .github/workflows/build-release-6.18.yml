@@ -19,7 +19,7 @@ jobs:
           - armv8
           - x86_64
         tag:
-          - type: dev
+          - type: rc2
             version: openwrt-24.10
 
     steps:
