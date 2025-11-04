@@ -1,4 +1,4 @@
-name: Build Snapshot Dev (6.18)
+name: Build Release Dev (6.18)
 
 on:
   workflow_dispatch:
