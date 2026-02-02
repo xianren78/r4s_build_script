@@ -21,6 +21,12 @@ jobs:
             version: openwrt-24.10
 
     steps:
+    - name: Checkout
+      continue-on-error: true
+      uses: actions/checkout@main
+      with:
+        path: r4s_build_script
+
     - name: Setup variables
       run: |
         sudo timedatectl set-timezone 'Asia/Shanghai'
