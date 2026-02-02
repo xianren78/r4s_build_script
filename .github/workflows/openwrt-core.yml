@@ -105,7 +105,7 @@ jobs:
         allowUpdates: true
         prerelease: true
         tag: snapshot
-        commit: main
+        commit: master
         replacesArtifacts: true
         token: ${{ secrets.workflow_token }}
         artifacts: |
