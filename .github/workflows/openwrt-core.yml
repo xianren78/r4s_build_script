@@ -75,7 +75,7 @@ jobs:
         git_password: ${{ secrets.password }}
         git_targetnew: ${{ secrets.TARGETNEW }}
       run: |
-        export BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y ENABLE_MOLD=y KERNEL_CLANG_LTO=y LAN=192.168.0.3 USE_GCC15=y ENABLE_CCACHE=y
+        export KERNEL_CLANG_LTO=y ENABLE_DPDK=y BUILD_FAST=y ENABLE_CCACHE=y ENABLE_OTA=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y USE_GCC15=y ENABLE_MOLD=y MINIMAL_BUILD=y OPENWRT_CORE=y
         bash <(curl -sS http://127.0.0.1:8080/build.sh) ${{ matrix.tag.type }} ${{ matrix.model }}
 
     - name: Extensive logs after a failed compilation
