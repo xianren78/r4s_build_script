@@ -13,6 +13,16 @@ rm -f target/linux/generic/hack-6.18/600-net-enable-fraglist-GRO-by-default.patc
 
 rm -f package/network/services/odhcpd/patches/001-odhcpd-RFC-9096-compliance.patch
 
+#openssl 3.0.17
+rm -f package/libs/openssl/patches/140-allow-prefer-chacha20.patch
+rm -f package/libs/openssl/patches/500-e_devcrypto-default-to-not-use-digests-in-engine.patch
+rm -f package/libs/openssl/patches/510-e_devcrypto-ignore-error-when-closing-session.patch
+pushd package/libs/openssl/patches
+	curl -s -f -L -O https://github.com/openwrt/openwrt/raw/08106add9c6ee3e72f46c948ed7a87360835a389/package/libs/openssl/patches/140-allow-prefer-chacha20.patch
+	curl -s -f -L -O https://github.com/openwrt/openwrt/raw/08106add9c6ee3e72f46c948ed7a87360835a389/package/libs/openssl/patches/500-e_devcrypto-default-to-not-use-digests-in-engine.patch
+	curl -s -f -L -O https://github.com/openwrt/openwrt/raw/08106add9c6ee3e72f46c948ed7a87360835a389/package/libs/openssl/patches/510-e_devcrypto-ignore-error-when-closing-session.patch
+popd
+
 # https://github.com/openwrt/openwrt/commit/cee749b88975fcd2861df648ff98d399e41aa1ea
 rm -f target/linux/generic/pending-6.12/620-net_sched-codel-do-not-defer-queue-length-update.patch
 rm -f target/linux/generic/pending-6.18/620-net_sched-codel-do-not-defer-queue-length-update.patch
