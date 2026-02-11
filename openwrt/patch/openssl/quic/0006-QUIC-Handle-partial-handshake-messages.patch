@@ -8,9 +8,11 @@ Subject: [PATCH 06/43] QUIC: Handle partial handshake messages
  ssl/ssl_quic.c  | 28 ++++++++++++++++++++++------
  2 files changed, 23 insertions(+), 6 deletions(-)
 
---- a/ssl/ssl_local.h
-+++ b/ssl/ssl_local.h
-@@ -1225,6 +1225,7 @@ typedef struct cert_pkey_st CERT_PKEY;
+Index: openssl-3.0.19/ssl/ssl_local.h
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_local.h
++++ openssl-3.0.19/ssl/ssl_local.h
+@@ -1238,6 +1238,7 @@ typedef struct cert_pkey_st CERT_PKEY;
  struct quic_data_st {
      struct quic_data_st *next;
      OSSL_ENCRYPTION_LEVEL level;
@@ -18,8 +20,10 @@ Subject: [PATCH 06/43] QUIC: Handle partial handshake messages
      size_t length;
  };
  typedef struct quic_data_st QUIC_DATA;
---- a/ssl/ssl_quic.c
-+++ b/ssl/ssl_quic.c
+Index: openssl-3.0.19/ssl/ssl_quic.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_quic.c
++++ openssl-3.0.19/ssl/ssl_quic.c
 @@ -114,15 +114,26 @@ int SSL_provide_quic_data(SSL *ssl, OSSL
          QUIC_DATA *qd;
          const uint8_t *p = data + 1;

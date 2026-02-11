@@ -9,8 +9,10 @@ matches BoringSSL behavior.
  ssl/ssl_quic.c | 3 +++
  1 file changed, 3 insertions(+)
 
---- a/ssl/ssl_quic.c
-+++ b/ssl/ssl_quic.c
+Index: openssl-3.0.19/ssl/ssl_quic.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_quic.c
++++ openssl-3.0.19/ssl/ssl_quic.c
 @@ -143,6 +143,9 @@ int SSL_provide_quic_data(SSL *ssl, OSSL
          return 0;
      }

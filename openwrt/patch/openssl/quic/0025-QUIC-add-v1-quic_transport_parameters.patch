@@ -21,8 +21,10 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
  util/libssl.num                      |   4 +
  15 files changed, 322 insertions(+), 37 deletions(-)
 
---- a/crypto/err/openssl.txt
-+++ b/crypto/err/openssl.txt
+Index: openssl-3.0.19/crypto/err/openssl.txt
+===================================================================
+--- openssl-3.0.19.orig/crypto/err/openssl.txt
++++ openssl-3.0.19/crypto/err/openssl.txt
 @@ -1391,6 +1391,8 @@ SSL_R_MISSING_ECDSA_SIGNING_CERT:381:mis
  SSL_R_MISSING_FATAL:256:missing fatal
  SSL_R_MISSING_PARAMETERS:290:missing parameters
@@ -32,8 +34,10 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
  SSL_R_MISSING_RSA_CERTIFICATE:168:missing rsa certificate
  SSL_R_MISSING_RSA_ENCRYPTING_CERT:169:missing rsa encrypting cert
  SSL_R_MISSING_RSA_SIGNING_CERT:170:missing rsa signing cert
---- a/doc/man3/SSL_CTX_set_quic_method.pod
-+++ b/doc/man3/SSL_CTX_set_quic_method.pod
+Index: openssl-3.0.19/doc/man3/SSL_CTX_set_quic_method.pod
+===================================================================
+--- openssl-3.0.19.orig/doc/man3/SSL_CTX_set_quic_method.pod
++++ openssl-3.0.19/doc/man3/SSL_CTX_set_quic_method.pod
 @@ -13,7 +13,11 @@ SSL_quic_read_level,
  SSL_quic_write_level,
  SSL_provide_quic_data,
@@ -80,9 +84,11 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
  =head1 NOTES
  
  These APIs are implementations of BoringSSL's QUIC APIs.
---- a/include/openssl/ssl.h.in
-+++ b/include/openssl/ssl.h.in
-@@ -2562,6 +2562,19 @@ __owur int SSL_process_quic_post_handsha
+Index: openssl-3.0.19/include/openssl/ssl.h.in
+===================================================================
+--- openssl-3.0.19.orig/include/openssl/ssl.h.in
++++ openssl-3.0.19/include/openssl/ssl.h.in
+@@ -2569,6 +2569,19 @@ __owur int SSL_process_quic_post_handsha
  
  __owur int SSL_is_quic(SSL *ssl);
  
@@ -102,42 +108,37 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
  int SSL_CIPHER_get_prf_nid(const SSL_CIPHER *c);
  
  #  endif
---- a/include/openssl/sslerr.h
-+++ b/include/openssl/sslerr.h
-@@ -162,6 +162,7 @@
- # define SSL_R_MISSING_FATAL                              256
- # define SSL_R_MISSING_PARAMETERS                         290
- # define SSL_R_MISSING_PSK_KEX_MODES_EXTENSION            310
+Index: openssl-3.0.19/include/openssl/sslerr.h
+===================================================================
+--- openssl-3.0.19.orig/include/openssl/sslerr.h
++++ openssl-3.0.19/include/openssl/sslerr.h
+@@ -160,6 +160,7 @@
+ #define SSL_R_MISSING_FATAL 256
+ #define SSL_R_MISSING_PARAMETERS 290
+ #define SSL_R_MISSING_PSK_KEX_MODES_EXTENSION 310
 +# define SSL_R_MISSING_QUIC_TRANSPORT_PARAMETERS_EXTENSION 801
- # define SSL_R_MISSING_RSA_CERTIFICATE                    168
- # define SSL_R_MISSING_RSA_ENCRYPTING_CERT                169
- # define SSL_R_MISSING_RSA_SIGNING_CERT                   170
---- a/include/openssl/tls1.h
-+++ b/include/openssl/tls1.h
-@@ -152,7 +152,8 @@ extern "C" {
- # define TLSEXT_TYPE_renegotiate                 0xff01
+ #define SSL_R_MISSING_RSA_CERTIFICATE 168
+ #define SSL_R_MISSING_RSA_ENCRYPTING_CERT 169
+ #define SSL_R_MISSING_RSA_SIGNING_CERT 170
+Index: openssl-3.0.19/include/openssl/tls1.h
+===================================================================
+--- openssl-3.0.19.orig/include/openssl/tls1.h
++++ openssl-3.0.19/include/openssl/tls1.h
+@@ -151,7 +151,8 @@ extern "C" {
+ #define TLSEXT_TYPE_renegotiate 0xff01
  
  /* ExtensionType value from draft-ietf-quic-tls-27 */
 -# define TLSEXT_TYPE_quic_transport_parameters   0xffa5
 +# define TLSEXT_TYPE_quic_transport_parameters_draft   0xffa5
 +# define TLSEXT_TYPE_quic_transport_parameters         0x0039
  
- # ifndef OPENSSL_NO_NEXTPROTONEG
+ #ifndef OPENSSL_NO_NEXTPROTONEG
  /* This is not an IANA defined extension number */
---- a/ssl/ssl_err.c
-+++ b/ssl/ssl_err.c
-@@ -242,6 +242,8 @@ static const ERR_STRING_DATA SSL_str_rea
-     {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_MISSING_PARAMETERS), "missing parameters"},
-     {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_MISSING_PSK_KEX_MODES_EXTENSION),
-     "missing psk kex modes extension"},
-+    {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_MISSING_QUIC_TRANSPORT_PARAMETERS_EXTENSION),
-+    "missing quic transport parameters extension"},
-     {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_MISSING_RSA_CERTIFICATE),
-     "missing rsa certificate"},
-     {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_MISSING_RSA_ENCRYPTING_CERT),
---- a/ssl/ssl_lib.c
-+++ b/ssl/ssl_lib.c
-@@ -1259,6 +1259,7 @@ void SSL_free(SSL *s)
+Index: openssl-3.0.19/ssl/ssl_lib.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_lib.c
++++ openssl-3.0.19/ssl/ssl_lib.c
+@@ -1245,6 +1245,7 @@ void SSL_free(SSL *s)
  
  #ifndef OPENSSL_NO_QUIC
      OPENSSL_free(s->ext.quic_transport_params);
@@ -145,9 +146,11 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
      OPENSSL_free(s->ext.peer_quic_transport_params);
      BUF_MEM_free(s->quic_buf);
      while (s->quic_input_data_head != NULL) {
---- a/ssl/ssl_local.h
-+++ b/ssl/ssl_local.h
-@@ -773,6 +773,7 @@ typedef enum tlsext_index_en {
+Index: openssl-3.0.19/ssl/ssl_local.h
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_local.h
++++ openssl-3.0.19/ssl/ssl_local.h
+@@ -786,6 +786,7 @@ typedef enum tlsext_index_en {
      TLSEXT_IDX_cryptopro_bug,
      TLSEXT_IDX_early_data,
      TLSEXT_IDX_certificate_authorities,
@@ -155,7 +158,7 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
      TLSEXT_IDX_quic_transport_params,
      TLSEXT_IDX_padding,
      TLSEXT_IDX_psk,
-@@ -1712,6 +1713,8 @@ struct ssl_st {
+@@ -1726,6 +1727,8 @@ struct ssl_st {
  #ifndef OPENSSL_NO_QUIC
          uint8_t *quic_transport_params;
          size_t quic_transport_params_len;
@@ -164,7 +167,7 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
          uint8_t *peer_quic_transport_params;
          size_t peer_quic_transport_params_len;
  #endif
-@@ -1722,6 +1725,14 @@ struct ssl_st {
+@@ -1736,6 +1739,14 @@ struct ssl_st {
      OSSL_ENCRYPTION_LEVEL quic_write_level;
      OSSL_ENCRYPTION_LEVEL quic_latest_level_received;
      BUF_MEM *quic_buf;          /* buffer incoming handshake messages */
@@ -179,8 +182,10 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
      QUIC_DATA *quic_input_data_head;
      QUIC_DATA *quic_input_data_tail;
      size_t quic_next_record_start;
---- a/ssl/ssl_quic.c
-+++ b/ssl/ssl_quic.c
+Index: openssl-3.0.19/ssl/ssl_quic.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_quic.c
++++ openssl-3.0.19/ssl/ssl_quic.c
 @@ -35,8 +35,45 @@ void SSL_get_peer_quic_transport_params(
                                          const uint8_t **out_params,
                                          size_t *out_params_len)
@@ -229,8 +234,10 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
  }
  
  size_t SSL_quic_max_handshake_flight_len(const SSL *ssl, OSSL_ENCRYPTION_LEVEL level)
---- a/ssl/statem/extensions.c
-+++ b/ssl/statem/extensions.c
+Index: openssl-3.0.19/ssl/statem/extensions.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/extensions.c
++++ openssl-3.0.19/ssl/statem/extensions.c
 @@ -61,6 +61,7 @@ static int init_post_handshake_auth(SSL
  static int final_psk(SSL *s, unsigned int context, int sent);
  #ifndef OPENSSL_NO_QUIC
@@ -239,7 +246,7 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
  static int final_quic_transport_params(SSL *s, unsigned int context, int sent);
  #endif
  
-@@ -376,6 +377,15 @@ static const EXTENSION_DEFINITION ext_de
+@@ -336,6 +337,15 @@ static const EXTENSION_DEFINITION ext_de
      },
  #ifndef OPENSSL_NO_QUIC
      {
@@ -255,7 +262,7 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
          TLSEXT_TYPE_quic_transport_parameters,
          SSL_EXT_CLIENT_HELLO | SSL_EXT_TLS1_3_ENCRYPTED_EXTENSIONS
          | SSL_EXT_TLS_IMPLEMENTATION_ONLY | SSL_EXT_TLS1_3_ONLY,
-@@ -1746,8 +1756,37 @@ static int init_quic_transport_params(SS
+@@ -1694,8 +1704,37 @@ static int init_quic_transport_params(SS
      return 1;
  }
  
@@ -293,11 +300,13 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
      return 1;
  }
  #endif
---- a/ssl/statem/extensions_clnt.c
-+++ b/ssl/statem/extensions_clnt.c
-@@ -1197,13 +1197,33 @@ EXT_RETURN tls_construct_ctos_post_hands
+Index: openssl-3.0.19/ssl/statem/extensions_clnt.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/extensions_clnt.c
++++ openssl-3.0.19/ssl/statem/extensions_clnt.c
+@@ -1196,13 +1196,33 @@ EXT_RETURN tls_construct_ctos_post_hands
  }
- 
+  
  #ifndef OPENSSL_NO_QUIC
 -/* SAME AS tls_construct_stoc_quic_transport_params() */
 +EXT_RETURN tls_construct_ctos_quic_transport_params_draft(SSL *s, WPACKET *pkt,
@@ -332,7 +341,7 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
          return EXT_RETURN_NOT_SENT;
      }
  
-@@ -2038,7 +2058,23 @@ int tls_parse_stoc_psk(SSL *s, PACKET *p
+@@ -2036,7 +2056,23 @@ int tls_parse_stoc_psk(SSL *s, PACKET *p
      return 1;
  }
  #ifndef OPENSSL_NO_QUIC
@@ -357,8 +366,10 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
  int tls_parse_stoc_quic_transport_params(SSL *s, PACKET *pkt, unsigned int context,
                                           X509 *x, size_t chainidx)
  {
---- a/ssl/statem/extensions_srvr.c
-+++ b/ssl/statem/extensions_srvr.c
+Index: openssl-3.0.19/ssl/statem/extensions_srvr.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/extensions_srvr.c
++++ openssl-3.0.19/ssl/statem/extensions_srvr.c
 @@ -1250,7 +1250,22 @@ int tls_parse_ctos_post_handshake_auth(S
  }
  
@@ -383,7 +394,7 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
  int tls_parse_ctos_quic_transport_params(SSL *s, PACKET *pkt, unsigned int context,
                                           X509 *x, size_t chainidx)
  {
-@@ -1961,13 +1976,36 @@ EXT_RETURN tls_construct_stoc_psk(SSL *s
+@@ -1963,13 +1978,36 @@ EXT_RETURN tls_construct_stoc_psk(SSL *s
  }
  
  #ifndef OPENSSL_NO_QUIC
@@ -423,11 +434,13 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
          return EXT_RETURN_NOT_SENT;
      }
  
---- a/ssl/statem/statem_local.h
-+++ b/ssl/statem/statem_local.h
+Index: openssl-3.0.19/ssl/statem/statem_local.h
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem_local.h
++++ openssl-3.0.19/ssl/statem/statem_local.h
 @@ -255,6 +255,10 @@ int tls_parse_ctos_psk(SSL *s, PACKET *p
  int tls_parse_ctos_post_handshake_auth(SSL *, PACKET *pkt, unsigned int context,
-                                        X509 *x, size_t chainidx);
+     X509 *x, size_t chainidx);
  #ifndef OPENSSL_NO_QUIC
 +int tls_parse_ctos_quic_transport_params_draft(SSL *s, PACKET *pkt,
 +                                               unsigned int context, X509 *x,
@@ -438,7 +451,7 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
  #endif
 @@ -319,6 +323,11 @@ EXT_RETURN tls_construct_stoc_cryptopro_
  EXT_RETURN tls_construct_stoc_psk(SSL *s, WPACKET *pkt, unsigned int context,
-                                   X509 *x, size_t chainidx);
+     X509 *x, size_t chainidx);
  #ifndef OPENSSL_NO_QUIC
 +EXT_RETURN tls_construct_stoc_quic_transport_params_draft(SSL *s, WPACKET *pkt,
 +                                                          unsigned int context,
@@ -450,7 +463,7 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
                                                      size_t chainidx);
 @@ -393,6 +402,10 @@ EXT_RETURN tls_construct_ctos_psk(SSL *s
  EXT_RETURN tls_construct_ctos_post_handshake_auth(SSL *s, WPACKET *pkt, unsigned int context,
-                                                   X509 *x, size_t chainidx);
+     X509 *x, size_t chainidx);
  #ifndef OPENSSL_NO_QUIC
 +EXT_RETURN tls_construct_ctos_quic_transport_params_draft(SSL *s, WPACKET *pkt,
 +                                                          unsigned int context, X509 *x,
@@ -461,7 +474,7 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
                                                      size_t chainidx);
 @@ -441,6 +454,10 @@ int tls_parse_stoc_cookie(SSL *s, PACKET
  int tls_parse_stoc_psk(SSL *s, PACKET *pkt, unsigned int context, X509 *x,
-                        size_t chainidx);
+     size_t chainidx);
  #ifndef OPENSSL_NO_QUIC
 +int tls_parse_stoc_quic_transport_params_draft(SSL *s, PACKET *pkt,
 +                                               unsigned int context, X509 *x,
@@ -470,9 +483,11 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
  int tls_parse_stoc_quic_transport_params(SSL *s, PACKET *pkt, unsigned int context,
                                           X509 *x, size_t chainidx);
  #endif
---- a/test/sslapitest.c
-+++ b/test/sslapitest.c
-@@ -10816,7 +10816,13 @@ static SSL_QUIC_METHOD quic_method = {
+Index: openssl-3.0.19/test/sslapitest.c
+===================================================================
+--- openssl-3.0.19.orig/test/sslapitest.c
++++ openssl-3.0.19/test/sslapitest.c
+@@ -10915,7 +10915,13 @@ static SSL_QUIC_METHOD quic_method = {
      test_quic_send_alert,
  };
  
@@ -487,7 +502,7 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
  {
      SSL_CTX *cctx = NULL, *sctx = NULL;
      SSL *clientssl = NULL, *serverssl = NULL;
-@@ -10827,29 +10833,7 @@ static int test_quic_api(void)
+@@ -10926,29 +10932,7 @@ static int test_quic_api(void)
      const uint8_t *peer_str;
      size_t peer_str_len;
  
@@ -518,7 +533,7 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
  
      if (!TEST_true(create_ssl_ctx_pair(libctx,
                                         TLS_server_method(),
-@@ -10868,6 +10852,8 @@ static int test_quic_api(void)
+@@ -10967,6 +10951,8 @@ static int test_quic_api(void)
                                                          sizeof(client_str)))
              || !TEST_true(SSL_set_app_data(serverssl, clientssl))
              || !TEST_true(SSL_set_app_data(clientssl, serverssl))
@@ -527,7 +542,7 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
              || !TEST_true(create_ssl_connection(serverssl, clientssl,
                                                  SSL_ERROR_NONE))
              || !TEST_true(SSL_version(serverssl) == TLS1_3_VERSION)
-@@ -10901,11 +10887,85 @@ static int test_quic_api(void)
+@@ -11000,11 +10986,85 @@ static int test_quic_api(void)
              || !TEST_int_le(SSL_do_handshake(serverssl), 0))
          goto end;
  
@@ -613,7 +628,7 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
  #endif /* OPENSSL_NO_QUIC */
  
  static struct next_proto_st {
-@@ -11626,7 +11686,7 @@ int setup_tests(void)
+@@ -11668,7 +11728,7 @@ int setup_tests(void)
      ADD_ALL_TESTS(test_alpn, 4);
      ADD_ALL_TESTS(test_no_renegotiation, 2);
  #ifndef OPENSSL_NO_QUIC
@@ -622,8 +637,10 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
  #endif
      return 1;
  
---- a/util/libssl.num
-+++ b/util/libssl.num
+Index: openssl-3.0.19/util/libssl.num
+===================================================================
+--- openssl-3.0.19.orig/util/libssl.num
++++ openssl-3.0.19/util/libssl.num
 @@ -531,3 +531,7 @@ SSL_set_quic_method
  SSL_quic_max_handshake_flight_len       20008	3_0_0	EXIST::FUNCTION:QUIC
  SSL_process_quic_post_handshake         20009	3_0_0	EXIST::FUNCTION:QUIC

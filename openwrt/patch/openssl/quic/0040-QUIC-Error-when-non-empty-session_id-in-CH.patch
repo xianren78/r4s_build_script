@@ -7,9 +7,11 @@ Subject: [PATCH 40/43] QUIC: Error when non-empty session_id in CH
  ssl/statem/statem_srvr.c | 9 +++++++++
  1 file changed, 9 insertions(+)
 
---- a/ssl/statem/statem_srvr.c
-+++ b/ssl/statem/statem_srvr.c
-@@ -1566,6 +1566,15 @@ MSG_PROCESS_RETURN tls_process_client_he
+Index: openssl-3.0.19/ssl/statem/statem_srvr.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem_srvr.c
++++ openssl-3.0.19/ssl/statem/statem_srvr.c
+@@ -1574,6 +1574,15 @@ MSG_PROCESS_RETURN tls_process_client_he
                  goto err;
              }
          }

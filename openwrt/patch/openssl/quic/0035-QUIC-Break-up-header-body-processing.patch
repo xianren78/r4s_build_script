@@ -10,9 +10,11 @@ As DTLS has changed, so too must QUIC.
  ssl/statem/statem_quic.c  | 25 +++++++++++++++----------
  3 files changed, 23 insertions(+), 14 deletions(-)
 
---- a/ssl/statem/statem.c
-+++ b/ssl/statem/statem.c
-@@ -586,7 +586,7 @@ static SUB_STATE_RETURN read_state_machi
+Index: openssl-3.0.19/ssl/statem/statem.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem.c
++++ openssl-3.0.19/ssl/statem/statem.c
+@@ -585,7 +585,7 @@ static SUB_STATE_RETURN read_state_machi
  #ifndef OPENSSL_NO_QUIC
              } else if (SSL_IS_QUIC(s)) {
                  /* QUIC behaves like DTLS -- all in one go. */
@@ -21,7 +23,7 @@ As DTLS has changed, so too must QUIC.
  #endif
              } else {
                  ret = tls_get_message_header(s, &mt);
-@@ -636,8 +636,11 @@ static SUB_STATE_RETURN read_state_machi
+@@ -634,8 +634,11 @@ static SUB_STATE_RETURN read_state_machi
                   * opportunity to do any further processing.
                   */
                  ret = dtls_get_message_body(s, &len);
@@ -35,8 +37,10 @@ As DTLS has changed, so too must QUIC.
                  ret = tls_get_message_body(s, &len);
              }
              if (ret == 0) {
---- a/ssl/statem/statem_local.h
-+++ b/ssl/statem/statem_local.h
+Index: openssl-3.0.19/ssl/statem/statem_local.h
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem_local.h
++++ openssl-3.0.19/ssl/statem/statem_local.h
 @@ -105,7 +105,8 @@ __owur int tls_get_message_body(SSL *s,
  __owur int dtls_get_message(SSL *s, int *mt);
  __owur int dtls_get_message_body(SSL *s, size_t *len);
@@ -47,8 +51,10 @@ As DTLS has changed, so too must QUIC.
  #endif
  
  /* Message construction and processing functions */
---- a/ssl/statem/statem_quic.c
-+++ b/ssl/statem/statem_quic.c
+Index: openssl-3.0.19/ssl/statem/statem_quic.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem_quic.c
++++ openssl-3.0.19/ssl/statem/statem_quic.c
 @@ -11,7 +11,7 @@
  #include "statem_local.h"
  #include "internal/cryptlib.h"

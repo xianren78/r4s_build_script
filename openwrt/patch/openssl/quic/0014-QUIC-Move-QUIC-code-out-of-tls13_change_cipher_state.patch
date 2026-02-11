@@ -11,8 +11,10 @@ initialized).
  ssl/tls13_enc.c | 217 ++++++++++++++++++++++++++++++------------------
  2 files changed, 138 insertions(+), 86 deletions(-)
 
---- a/ssl/ssl_quic.c
-+++ b/ssl/ssl_quic.c
+Index: openssl-3.0.19/ssl/ssl_quic.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_quic.c
++++ openssl-3.0.19/ssl/ssl_quic.c
 @@ -199,7 +199,6 @@ int quic_set_encryption_secrets(SSL *ssl
      uint8_t *s2c_secret = NULL;
      size_t len;
@@ -34,23 +36,25 @@ initialized).
      if (ssl->server) {
          if (!ssl->quic_method->set_encryption_secrets(ssl, level, c2s_secret,
                                                        s2c_secret, len)) {
---- a/ssl/tls13_enc.c
-+++ b/ssl/tls13_enc.c
-@@ -400,27 +400,144 @@ static int derive_secret_key_and_iv(SSL
+Index: openssl-3.0.19/ssl/tls13_enc.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/tls13_enc.c
++++ openssl-3.0.19/ssl/tls13_enc.c
+@@ -399,27 +399,144 @@ static int derive_secret_key_and_iv(SSL
      return 1;
  }
  
 -int tls13_change_cipher_state(SSL *s, int which)
 -{
  #ifdef CHARSET_EBCDIC
--  static const unsigned char client_early_traffic[]       = {0x63, 0x20, 0x65, 0x20,       /*traffic*/0x74, 0x72, 0x61, 0x66, 0x66, 0x69, 0x63, 0x00};
--  static const unsigned char client_handshake_traffic[]   = {0x63, 0x20, 0x68, 0x73, 0x20, /*traffic*/0x74, 0x72, 0x61, 0x66, 0x66, 0x69, 0x63, 0x00};
--  static const unsigned char client_application_traffic[] = {0x63, 0x20, 0x61, 0x70, 0x20, /*traffic*/0x74, 0x72, 0x61, 0x66, 0x66, 0x69, 0x63, 0x00};
--  static const unsigned char server_handshake_traffic[]   = {0x73, 0x20, 0x68, 0x73, 0x20, /*traffic*/0x74, 0x72, 0x61, 0x66, 0x66, 0x69, 0x63, 0x00};
--  static const unsigned char server_application_traffic[] = {0x73, 0x20, 0x61, 0x70, 0x20, /*traffic*/0x74, 0x72, 0x61, 0x66, 0x66, 0x69, 0x63, 0x00};
--  static const unsigned char exporter_master_secret[] = {0x65, 0x78, 0x70, 0x20,                    /* master*/  0x6D, 0x61, 0x73, 0x74, 0x65, 0x72, 0x00};
--  static const unsigned char resumption_master_secret[] = {0x72, 0x65, 0x73, 0x20,                  /* master*/  0x6D, 0x61, 0x73, 0x74, 0x65, 0x72, 0x00};
--  static const unsigned char early_exporter_master_secret[] = {0x65, 0x20, 0x65, 0x78, 0x70, 0x20,  /* master*/  0x6D, 0x61, 0x73, 0x74, 0x65, 0x72, 0x00};
+-    static const unsigned char client_early_traffic[] = { 0x63, 0x20, 0x65, 0x20, /*traffic*/ 0x74, 0x72, 0x61, 0x66, 0x66, 0x69, 0x63, 0x00 };
+-    static const unsigned char client_handshake_traffic[] = { 0x63, 0x20, 0x68, 0x73, 0x20, /*traffic*/ 0x74, 0x72, 0x61, 0x66, 0x66, 0x69, 0x63, 0x00 };
+-    static const unsigned char client_application_traffic[] = { 0x63, 0x20, 0x61, 0x70, 0x20, /*traffic*/ 0x74, 0x72, 0x61, 0x66, 0x66, 0x69, 0x63, 0x00 };
+-    static const unsigned char server_handshake_traffic[] = { 0x73, 0x20, 0x68, 0x73, 0x20, /*traffic*/ 0x74, 0x72, 0x61, 0x66, 0x66, 0x69, 0x63, 0x00 };
+-    static const unsigned char server_application_traffic[] = { 0x73, 0x20, 0x61, 0x70, 0x20, /*traffic*/ 0x74, 0x72, 0x61, 0x66, 0x66, 0x69, 0x63, 0x00 };
+-    static const unsigned char exporter_master_secret[] = { 0x65, 0x78, 0x70, 0x20, /* master*/ 0x6D, 0x61, 0x73, 0x74, 0x65, 0x72, 0x00 };
+-    static const unsigned char resumption_master_secret[] = { 0x72, 0x65, 0x73, 0x20, /* master*/ 0x6D, 0x61, 0x73, 0x74, 0x65, 0x72, 0x00 };
+-    static const unsigned char early_exporter_master_secret[] = { 0x65, 0x20, 0x65, 0x78, 0x70, 0x20, /* master*/ 0x6D, 0x61, 0x73, 0x74, 0x65, 0x72, 0x00 };
 +static const unsigned char client_early_traffic[]       = {0x63, 0x20, 0x65, 0x20,       /*traffic*/0x74, 0x72, 0x61, 0x66, 0x66, 0x69, 0x63, 0x00};
 +static const unsigned char client_handshake_traffic[]   = {0x63, 0x20, 0x68, 0x73, 0x20, /*traffic*/0x74, 0x72, 0x61, 0x66, 0x66, 0x69, 0x63, 0x00};
 +static const unsigned char client_application_traffic[] = {0x63, 0x20, 0x61, 0x70, 0x20, /*traffic*/0x74, 0x72, 0x61, 0x66, 0x66, 0x69, 0x63, 0x00};
@@ -199,7 +203,7 @@ initialized).
      unsigned char *iv;
      unsigned char key[EVP_MAX_KEY_LENGTH];
      unsigned char secret[EVP_MAX_MD_SIZE];
-@@ -440,8 +557,10 @@ int tls13_change_cipher_state(SSL *s, in
+@@ -439,8 +556,10 @@ int tls13_change_cipher_state(SSL *s, in
      ktls_crypto_info_t crypto_info;
      BIO *bio;
  #endif
@@ -211,7 +215,7 @@ initialized).
  #endif
  
      if (which & SSL3_CC_READ) {
-@@ -488,9 +607,6 @@ int tls13_change_cipher_state(SSL *s, in
+@@ -487,9 +606,6 @@ int tls13_change_cipher_state(SSL *s, in
              label = client_early_traffic;
              labellen = sizeof(client_early_traffic) - 1;
              log_label = CLIENT_EARLY_LABEL;
@@ -221,7 +225,7 @@ initialized).
  
              handlen = BIO_get_mem_data(s->s3.handshake_buffer, &hdata);
              if (handlen <= 0) {
-@@ -567,14 +683,6 @@ int tls13_change_cipher_state(SSL *s, in
+@@ -565,14 +681,6 @@ int tls13_change_cipher_state(SSL *s, in
                  /* SSLfatal() already called */
                  goto err;
              }
@@ -236,7 +240,7 @@ initialized).
          } else if (which & SSL3_CC_HANDSHAKE) {
              insecret = s->handshake_secret;
              finsecret = s->client_finished_secret;
-@@ -582,15 +690,6 @@ int tls13_change_cipher_state(SSL *s, in
+@@ -580,15 +688,6 @@ int tls13_change_cipher_state(SSL *s, in
              label = client_handshake_traffic;
              labellen = sizeof(client_handshake_traffic) - 1;
              log_label = CLIENT_HANDSHAKE_LABEL;
@@ -252,7 +256,7 @@ initialized).
              /*
               * The handshake hash used for the server read/client write handshake
               * traffic secret is the same as the hash for the server
-@@ -613,15 +712,6 @@ int tls13_change_cipher_state(SSL *s, in
+@@ -611,15 +710,6 @@ int tls13_change_cipher_state(SSL *s, in
               * previously saved value.
               */
              hash = s->server_finished_hash;
@@ -268,7 +272,7 @@ initialized).
          }
      } else {
          /* Early data never applies to client-read/server-write */
-@@ -632,29 +722,11 @@ int tls13_change_cipher_state(SSL *s, in
+@@ -630,29 +720,11 @@ int tls13_change_cipher_state(SSL *s, in
              label = server_handshake_traffic;
              labellen = sizeof(server_handshake_traffic) - 1;
              log_label = SERVER_HANDSHAKE_LABEL;
@@ -298,7 +302,7 @@ initialized).
          }
      }
  
-@@ -723,14 +795,6 @@ int tls13_change_cipher_state(SSL *s, in
+@@ -721,14 +793,6 @@ int tls13_change_cipher_state(SSL *s, in
          }
      } else if (label == client_application_traffic)
          memcpy(s->client_app_traffic_secret, secret, hashlen);
@@ -313,8 +317,8 @@ initialized).
  
      if (!ssl_log_secret(s, log_label, secret, hashlen)) {
          /* SSLfatal() already called */
-@@ -791,11 +855,6 @@ skip_ktls:
- # endif
+@@ -789,11 +853,6 @@ skip_ktls:
+ #endif
  #endif
  
 -#ifndef OPENSSL_NO_QUIC
@@ -323,5 +327,5 @@ initialized).
 -#endif
 -
      ret = 1;
-  err:
+ err:
      if ((which & SSL3_CC_EARLY) != 0) {

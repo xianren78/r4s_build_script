@@ -11,8 +11,10 @@ Subject: [PATCH 37/43] QUIC: Update RFC references
  ssl/statem/statem_clnt.c             |  2 +-
  5 files changed, 9 insertions(+), 10 deletions(-)
 
---- a/doc/man3/SSL_CTX_set_quic_method.pod
-+++ b/doc/man3/SSL_CTX_set_quic_method.pod
+Index: openssl-3.0.19/doc/man3/SSL_CTX_set_quic_method.pod
+===================================================================
+--- openssl-3.0.19.orig/doc/man3/SSL_CTX_set_quic_method.pod
++++ openssl-3.0.19/doc/man3/SSL_CTX_set_quic_method.pod
 @@ -74,7 +74,7 @@ SSL_quic_max_handshake_flight_len() retu
  that may be received at the given encryption level. This function should be
  used to limit buffering in the QUIC implementation.
@@ -53,20 +55,24 @@ Subject: [PATCH 37/43] QUIC: Update RFC references
  a sequence of tag/length/value parameters) along with the interpretation of the
  various parameters and the rules for their processing.
  
---- a/include/openssl/tls1.h
-+++ b/include/openssl/tls1.h
-@@ -151,7 +151,7 @@ extern "C" {
+Index: openssl-3.0.19/include/openssl/tls1.h
+===================================================================
+--- openssl-3.0.19.orig/include/openssl/tls1.h
++++ openssl-3.0.19/include/openssl/tls1.h
+@@ -150,7 +150,7 @@ extern "C" {
  /* Temporary extension type */
- # define TLSEXT_TYPE_renegotiate                 0xff01
+ #define TLSEXT_TYPE_renegotiate 0xff01
  
 -/* ExtensionType value from draft-ietf-quic-tls-27 */
-+    /* ExtensionType value from RFC9001 */
++/* ExtensionType value from RFC9001 */
  # define TLSEXT_TYPE_quic_transport_parameters_draft   0xffa5
  # define TLSEXT_TYPE_quic_transport_parameters         0x0039
  
---- a/ssl/statem/extensions_clnt.c
-+++ b/ssl/statem/extensions_clnt.c
-@@ -1967,7 +1967,7 @@ int tls_parse_stoc_early_data(SSL *s, PA
+Index: openssl-3.0.19/ssl/statem/extensions_clnt.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/extensions_clnt.c
++++ openssl-3.0.19/ssl/statem/extensions_clnt.c
+@@ -1965,7 +1965,7 @@ int tls_parse_stoc_early_data(SSL *s, PA
  #ifndef OPENSSL_NO_QUIC
          /*
           * QUIC server must send 0xFFFFFFFF or it's a PROTOCOL_VIOLATION
@@ -75,9 +81,11 @@ Subject: [PATCH 37/43] QUIC: Update RFC references
           */
          if (s->quic_method != NULL && max_early_data != 0xFFFFFFFF) {
              SSLfatal(s, SSL_AD_ILLEGAL_PARAMETER, SSL_R_INVALID_MAX_EARLY_DATA);
---- a/ssl/statem/extensions_srvr.c
-+++ b/ssl/statem/extensions_srvr.c
-@@ -1929,7 +1929,7 @@ EXT_RETURN tls_construct_stoc_early_data
+Index: openssl-3.0.19/ssl/statem/extensions_srvr.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/extensions_srvr.c
++++ openssl-3.0.19/ssl/statem/extensions_srvr.c
+@@ -1931,7 +1931,7 @@ EXT_RETURN tls_construct_stoc_early_data
              return EXT_RETURN_NOT_SENT;
  
  #ifndef OPENSSL_NO_QUIC
@@ -86,9 +94,11 @@ Subject: [PATCH 37/43] QUIC: Update RFC references
          if (SSL_IS_QUIC(s))
              max_early_data = 0xFFFFFFFF;
  #endif
---- a/ssl/statem/statem_clnt.c
-+++ b/ssl/statem/statem_clnt.c
-@@ -905,7 +905,7 @@ int ossl_statem_client_construct_message
+Index: openssl-3.0.19/ssl/statem/statem_clnt.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem_clnt.c
++++ openssl-3.0.19/ssl/statem/statem_clnt.c
+@@ -903,7 +903,7 @@ int ossl_statem_client_construct_message
  
      case TLS_ST_CW_END_OF_EARLY_DATA:
  #ifndef OPENSSL_NO_QUIC

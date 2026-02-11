@@ -7,8 +7,10 @@ Subject: [PATCH 19/43] QUIC: Fall-through for 0RTT
  ssl/statem/statem_srvr.c | 7 ++-----
  1 file changed, 2 insertions(+), 5 deletions(-)
 
---- a/ssl/statem/statem_srvr.c
-+++ b/ssl/statem/statem_srvr.c
+Index: openssl-3.0.19/ssl/statem/statem_srvr.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem_srvr.c
++++ openssl-3.0.19/ssl/statem/statem_srvr.c
 @@ -74,12 +74,9 @@ static int ossl_statem_server13_read_tra
                  return 1;
              }

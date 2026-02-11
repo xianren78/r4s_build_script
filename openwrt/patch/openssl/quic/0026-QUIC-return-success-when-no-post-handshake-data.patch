@@ -7,8 +7,10 @@ Subject: [PATCH 26/43] QUIC: return success when no post-handshake data
  ssl/ssl_quic.c | 4 ++++
  1 file changed, 4 insertions(+)
 
---- a/ssl/ssl_quic.c
-+++ b/ssl/ssl_quic.c
+Index: openssl-3.0.19/ssl/ssl_quic.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_quic.c
++++ openssl-3.0.19/ssl/ssl_quic.c
 @@ -309,6 +309,10 @@ int SSL_process_quic_post_handshake(SSL
          return 0;
      }

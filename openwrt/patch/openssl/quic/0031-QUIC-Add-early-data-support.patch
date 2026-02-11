@@ -18,8 +18,10 @@ support to QUIC.
  util/libssl.num                      |   1 +
  8 files changed, 327 insertions(+), 33 deletions(-)
 
---- a/doc/man3/SSL_CTX_set_quic_method.pod
-+++ b/doc/man3/SSL_CTX_set_quic_method.pod
+Index: openssl-3.0.19/doc/man3/SSL_CTX_set_quic_method.pod
+===================================================================
+--- openssl-3.0.19.orig/doc/man3/SSL_CTX_set_quic_method.pod
++++ openssl-3.0.19/doc/man3/SSL_CTX_set_quic_method.pod
 @@ -17,7 +17,8 @@ SSL_is_quic,
  SSL_get_peer_quic_transport_version,
  SSL_get_quic_transport_version,
@@ -51,9 +53,11 @@ support to QUIC.
  =head1 NOTES
  
  These APIs are implementations of BoringSSL's QUIC APIs.
---- a/include/openssl/ssl.h.in
-+++ b/include/openssl/ssl.h.in
-@@ -2577,6 +2577,8 @@ __owur int SSL_get_peer_quic_transport_v
+Index: openssl-3.0.19/include/openssl/ssl.h.in
+===================================================================
+--- openssl-3.0.19.orig/include/openssl/ssl.h.in
++++ openssl-3.0.19/include/openssl/ssl.h.in
+@@ -2584,6 +2584,8 @@ __owur int SSL_get_peer_quic_transport_v
  
  int SSL_CIPHER_get_prf_nid(const SSL_CIPHER *c);
  
@@ -61,10 +65,12 @@ support to QUIC.
 +
  #  endif
  
- # ifdef  __cplusplus
---- a/ssl/ssl_lib.c
-+++ b/ssl/ssl_lib.c
-@@ -4015,6 +4015,21 @@ int SSL_do_handshake(SSL *s)
+ #ifdef __cplusplus
+Index: openssl-3.0.19/ssl/ssl_lib.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_lib.c
++++ openssl-3.0.19/ssl/ssl_lib.c
+@@ -3975,6 +3975,21 @@ int SSL_do_handshake(SSL *s)
              ret = s->handshake_func(s);
          }
      }
@@ -86,8 +92,10 @@ support to QUIC.
      return ret;
  }
  
---- a/ssl/ssl_quic.c
-+++ b/ssl/ssl_quic.c
+Index: openssl-3.0.19/ssl/ssl_quic.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_quic.c
++++ openssl-3.0.19/ssl/ssl_quic.c
 @@ -257,24 +257,46 @@ int quic_set_encryption_secrets(SSL *ssl
          return 1;
      }
@@ -177,12 +185,14 @@ support to QUIC.
 +
 +    ssl->early_data_state = SSL_EARLY_DATA_CONNECTING;
 +}
---- a/ssl/statem/statem_srvr.c
-+++ b/ssl/statem/statem_srvr.c
-@@ -964,6 +964,16 @@ WORK_STATE ossl_statem_server_post_work(
-                         SSL3_CC_APPLICATION | SSL3_CHANGE_CIPHER_SERVER_WRITE))
-             /* SSLfatal() already called */
-             return WORK_ERROR;
+Index: openssl-3.0.19/ssl/statem/statem_srvr.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem_srvr.c
++++ openssl-3.0.19/ssl/statem/statem_srvr.c
+@@ -962,6 +962,16 @@ WORK_STATE ossl_statem_server_post_work(
+                     SSL3_CC_APPLICATION | SSL3_CHANGE_CIPHER_SERVER_WRITE))
+                 /* SSLfatal() already called */
+                 return WORK_ERROR;
 +
 +#ifndef OPENSSL_NO_QUIC
 +            if (SSL_IS_QUIC(s) && s->ext.early_data == SSL_EARLY_DATA_ACCEPTED) {
@@ -196,9 +206,11 @@ support to QUIC.
          }
          break;
  
---- a/ssl/tls13_enc.c
-+++ b/ssl/tls13_enc.c
-@@ -434,20 +434,76 @@ static int quic_change_cipher_state(SSL
+Index: openssl-3.0.19/ssl/tls13_enc.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/tls13_enc.c
++++ openssl-3.0.19/ssl/tls13_enc.c
+@@ -433,20 +433,76 @@ static int quic_change_cipher_state(SSL
      int is_server_write = ((which & SSL3_CHANGE_CIPHER_SERVER_WRITE) == SSL3_CHANGE_CIPHER_SERVER_WRITE);
      int is_early = (which & SSL3_CC_EARLY);
  
@@ -287,7 +299,7 @@ support to QUIC.
  
      if (is_client_read || is_server_write) {
          if (is_handshake) {
-@@ -553,10 +609,12 @@ static int quic_change_cipher_state(SSL
+@@ -552,10 +608,12 @@ static int quic_change_cipher_state(SSL
              }
          }
  
@@ -304,9 +316,11 @@ support to QUIC.
      }
  
      ret = 1;
---- a/test/sslapitest.c
-+++ b/test/sslapitest.c
-@@ -10966,6 +10966,159 @@ end:
+Index: openssl-3.0.19/test/sslapitest.c
+===================================================================
+--- openssl-3.0.19.orig/test/sslapitest.c
++++ openssl-3.0.19/test/sslapitest.c
+@@ -11065,6 +11065,159 @@ end:
      serverssl = NULL;
      return testresult;
  }
@@ -466,7 +480,7 @@ support to QUIC.
  #endif /* OPENSSL_NO_QUIC */
  
  static struct next_proto_st {
-@@ -11687,6 +11840,9 @@ int setup_tests(void)
+@@ -11729,6 +11882,9 @@ int setup_tests(void)
      ADD_ALL_TESTS(test_no_renegotiation, 2);
  #ifndef OPENSSL_NO_QUIC
      ADD_ALL_TESTS(test_quic_api, 9);
@@ -476,8 +490,10 @@ support to QUIC.
  #endif
      return 1;
  
---- a/util/libssl.num
-+++ b/util/libssl.num
+Index: openssl-3.0.19/util/libssl.num
+===================================================================
+--- openssl-3.0.19.orig/util/libssl.num
++++ openssl-3.0.19/util/libssl.num
 @@ -535,3 +535,4 @@ SSL_set_quic_use_legacy_codepoint
  SSL_set_quic_transport_version          20012	3_0_0	EXIST::FUNCTION:QUIC
  SSL_get_peer_quic_transport_version     20013	3_0_0	EXIST::FUNCTION:QUIC

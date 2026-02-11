@@ -8,9 +8,11 @@ Subject: [PATCH 43/43] QUIC: Fix extension test
  test/ext_internal_test.c | 7 +++++++
  2 files changed, 9 insertions(+), 2 deletions(-)
 
---- a/ssl/ssl_local.h
-+++ b/ssl/ssl_local.h
-@@ -773,8 +773,8 @@ typedef enum tlsext_index_en {
+Index: openssl-3.0.19/ssl/ssl_local.h
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_local.h
++++ openssl-3.0.19/ssl/ssl_local.h
+@@ -786,8 +786,8 @@ typedef enum tlsext_index_en {
      TLSEXT_IDX_cryptopro_bug,
      TLSEXT_IDX_early_data,
      TLSEXT_IDX_certificate_authorities,
@@ -21,8 +23,10 @@ Subject: [PATCH 43/43] QUIC: Fix extension test
      TLSEXT_IDX_padding,
      TLSEXT_IDX_psk,
      /* Dummy index - must always be the last entry */
---- a/test/ext_internal_test.c
-+++ b/test/ext_internal_test.c
+Index: openssl-3.0.19/test/ext_internal_test.c
+===================================================================
+--- openssl-3.0.19.orig/test/ext_internal_test.c
++++ openssl-3.0.19/test/ext_internal_test.c
 @@ -69,6 +69,13 @@ static EXT_LIST ext_list[] = {
      EXT_ENTRY(cryptopro_bug),
      EXT_ENTRY(early_data),

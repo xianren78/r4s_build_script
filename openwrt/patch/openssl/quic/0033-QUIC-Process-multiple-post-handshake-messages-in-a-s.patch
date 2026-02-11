@@ -9,8 +9,10 @@ Subject: [PATCH 33/43] QUIC: Process multiple post-handshake messages in a
  test/sslapitest.c |  6 ++----
  2 files changed, 15 insertions(+), 18 deletions(-)
 
---- a/ssl/ssl_quic.c
-+++ b/ssl/ssl_quic.c
+Index: openssl-3.0.19/ssl/ssl_quic.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_quic.c
++++ openssl-3.0.19/ssl/ssl_quic.c
 @@ -334,20 +334,19 @@ int SSL_process_quic_post_handshake(SSL
      }
  
@@ -44,9 +46,11 @@ Subject: [PATCH 33/43] QUIC: Process multiple post-handshake messages in a
      return 1;
  }
  
---- a/test/sslapitest.c
-+++ b/test/sslapitest.c
-@@ -10872,8 +10872,7 @@ static int test_quic_api_version(int cln
+Index: openssl-3.0.19/test/sslapitest.c
+===================================================================
+--- openssl-3.0.19.orig/test/sslapitest.c
++++ openssl-3.0.19/test/sslapitest.c
+@@ -10971,8 +10971,7 @@ static int test_quic_api_version(int cln
          goto end;
  
      /* Deal with two NewSessionTickets */
@@ -56,7 +60,7 @@ Subject: [PATCH 33/43] QUIC: Process multiple post-handshake messages in a
          goto end;
  
      /* Dummy handshake call should succeed */
-@@ -11060,8 +11059,7 @@ static int quic_setupearly_data_test(SSL
+@@ -11159,8 +11158,7 @@ static int quic_setupearly_data_test(SSL
          return 0;
  
      /* Deal with two NewSessionTickets */

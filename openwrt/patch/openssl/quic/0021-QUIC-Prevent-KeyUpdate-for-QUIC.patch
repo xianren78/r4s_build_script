@@ -13,8 +13,10 @@ input to the TLS layer for a QUIC connection).
  ssl/statem/statem_lib.c | 14 ++++++++++++++
  2 files changed, 20 insertions(+)
 
---- a/ssl/ssl_quic.c
-+++ b/ssl/ssl_quic.c
+Index: openssl-3.0.19/ssl/ssl_quic.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_quic.c
++++ openssl-3.0.19/ssl/ssl_quic.c
 @@ -92,6 +92,7 @@ int SSL_provide_quic_data(SSL *ssl, OSSL
                            const uint8_t *data, size_t len)
  {
@@ -38,9 +40,11 @@ input to the TLS layer for a QUIC connection).
  
          qd = OPENSSL_zalloc(sizeof(QUIC_DATA) + l);
          if (qd == NULL) {
---- a/ssl/statem/statem_lib.c
-+++ b/ssl/statem/statem_lib.c
-@@ -666,6 +666,13 @@ int tls_construct_finished(SSL *s, WPACK
+Index: openssl-3.0.19/ssl/statem/statem_lib.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem_lib.c
++++ openssl-3.0.19/ssl/statem/statem_lib.c
+@@ -668,6 +668,13 @@ int tls_construct_finished(SSL *s, WPACK
  
  int tls_construct_key_update(SSL *s, WPACKET *pkt)
  {
@@ -54,7 +58,7 @@ input to the TLS layer for a QUIC connection).
      if (!WPACKET_put_bytes_u8(pkt, s->key_update)) {
          SSLfatal(s, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);
          return 0;
-@@ -688,6 +695,13 @@ MSG_PROCESS_RETURN tls_process_key_updat
+@@ -690,6 +697,13 @@ MSG_PROCESS_RETURN tls_process_key_updat
          return MSG_PROCESS_ERROR;
      }
  
@@ -66,5 +70,5 @@ input to the TLS layer for a QUIC connection).
 +#endif
 +
      if (!PACKET_get_1(pkt, &updatetype)
-             || PACKET_remaining(pkt) != 0) {
+         || PACKET_remaining(pkt) != 0) {
          SSLfatal(s, SSL_AD_DECODE_ERROR, SSL_R_BAD_KEY_UPDATE);

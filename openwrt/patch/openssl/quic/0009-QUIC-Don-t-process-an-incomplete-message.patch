@@ -7,8 +7,10 @@ Subject: [PATCH 09/43] QUIC: Don't process an incomplete message
  ssl/statem/statem_quic.c | 9 ++++-----
  1 file changed, 4 insertions(+), 5 deletions(-)
 
---- a/ssl/statem/statem_quic.c
-+++ b/ssl/statem/statem_quic.c
+Index: openssl-3.0.19/ssl/statem/statem_quic.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem_quic.c
++++ openssl-3.0.19/ssl/statem/statem_quic.c
 @@ -18,30 +18,29 @@ NON_EMPTY_TRANSLATION_UNIT
  int quic_get_message(SSL *s, int *mt, size_t *len)
  {

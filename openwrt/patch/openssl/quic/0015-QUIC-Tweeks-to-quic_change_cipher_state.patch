@@ -7,9 +7,11 @@ Subject: [PATCH 15/43] QUIC: Tweeks to quic_change_cipher_state()
  ssl/tls13_enc.c | 69 +++++++++++++++++--------------------------------
  1 file changed, 24 insertions(+), 45 deletions(-)
 
---- a/ssl/tls13_enc.c
-+++ b/ssl/tls13_enc.c
-@@ -448,33 +448,18 @@ static int quic_change_cipher_state(SSL
+Index: openssl-3.0.19/ssl/tls13_enc.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/tls13_enc.c
++++ openssl-3.0.19/ssl/tls13_enc.c
+@@ -447,33 +447,18 @@ static int quic_change_cipher_state(SSL
      }
      hashlen = (size_t)hashleni;
  
@@ -49,7 +51,7 @@ Subject: [PATCH 15/43] QUIC: Tweeks to quic_change_cipher_state()
                  /* SSLfatal() already called */
                  goto err;
              }
-@@ -483,26 +468,20 @@ static int quic_change_cipher_state(SSL
+@@ -482,26 +467,20 @@ static int quic_change_cipher_state(SSL
  
              if (!tls13_hkdf_expand(s, md, s->master_secret, client_application_traffic,
                                     sizeof(client_application_traffic)-1, hash, hashlen,
@@ -86,7 +88,7 @@ Subject: [PATCH 15/43] QUIC: Tweeks to quic_change_cipher_state()
          if (s->server)
              s->quic_write_level = level;
          else
-@@ -513,24 +492,24 @@ static int quic_change_cipher_state(SSL
+@@ -512,24 +491,24 @@ static int quic_change_cipher_state(SSL
  
              if (!tls13_hkdf_expand(s, md, s->early_secret, client_early_traffic,
                                     sizeof(client_early_traffic)-1, hash, hashlen,

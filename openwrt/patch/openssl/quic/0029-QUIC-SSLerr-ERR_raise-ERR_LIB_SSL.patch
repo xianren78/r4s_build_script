@@ -11,8 +11,10 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
  ssl/statem/statem_lib.c |  4 ++--
  5 files changed, 15 insertions(+), 16 deletions(-)
 
---- a/ssl/s3_msg.c
-+++ b/ssl/s3_msg.c
+Index: openssl-3.0.19/ssl/s3_msg.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/s3_msg.c
++++ openssl-3.0.19/ssl/s3_msg.c
 @@ -85,7 +85,7 @@ int ssl3_dispatch_alert(SSL *s)
      if (SSL_IS_QUIC(s)) {
          if (!s->quic_method->send_alert(s, s->quic_write_level,
@@ -22,9 +24,11 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
              return 0;
          }
          i = 1;
---- a/ssl/ssl_lib.c
-+++ b/ssl/ssl_lib.c
-@@ -1872,7 +1872,7 @@ int ssl_read_internal(SSL *s, void *buf,
+Index: openssl-3.0.19/ssl/ssl_lib.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_lib.c
++++ openssl-3.0.19/ssl/ssl_lib.c
+@@ -1840,7 +1840,7 @@ int ssl_read_internal(SSL *s, void *buf,
  {
  #ifndef OPENSSL_NO_QUIC
      if (SSL_IS_QUIC(s)) {
@@ -33,7 +37,7 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
          return -1;
      }
  #endif
-@@ -2009,7 +2009,7 @@ static int ssl_peek_internal(SSL *s, voi
+@@ -1976,7 +1976,7 @@ static int ssl_peek_internal(SSL *s, voi
  {
  #ifndef OPENSSL_NO_QUIC
      if (SSL_IS_QUIC(s)) {
@@ -42,7 +46,7 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
          return -1;
      }
  #endif
-@@ -2075,7 +2075,7 @@ int ssl_write_internal(SSL *s, const voi
+@@ -2041,7 +2041,7 @@ int ssl_write_internal(SSL *s, const voi
  {
  #ifndef OPENSSL_NO_QUIC
      if (SSL_IS_QUIC(s)) {
@@ -51,8 +55,10 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
          return -1;
      }
  #endif
---- a/ssl/ssl_quic.c
-+++ b/ssl/ssl_quic.c
+Index: openssl-3.0.19/ssl/ssl_quic.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_quic.c
++++ openssl-3.0.19/ssl/ssl_quic.c
 @@ -131,7 +131,7 @@ int SSL_provide_quic_data(SSL *ssl, OSSL
      size_t l, offset;
  
@@ -120,9 +126,11 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
          return 0;
      }
  
---- a/ssl/statem/statem.c
-+++ b/ssl/statem/statem.c
-@@ -930,7 +930,7 @@ int statem_flush(SSL *s)
+Index: openssl-3.0.19/ssl/statem/statem.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem.c
++++ openssl-3.0.19/ssl/statem/statem.c
+@@ -928,7 +928,7 @@ int statem_flush(SSL *s)
  #ifndef OPENSSL_NO_QUIC
      if (SSL_IS_QUIC(s)) {
          if (!s->quic_method->flush_flight(s)) {
@@ -131,8 +139,10 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
              return 0;
          }
      } else
---- a/ssl/statem/statem_lib.c
-+++ b/ssl/statem/statem_lib.c
+Index: openssl-3.0.19/ssl/statem/statem_lib.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem_lib.c
++++ openssl-3.0.19/ssl/statem/statem_lib.c
 @@ -54,14 +54,14 @@ int ssl3_do_write(SSL *s, int type)
              if (!ret) {
                  ret = -1;

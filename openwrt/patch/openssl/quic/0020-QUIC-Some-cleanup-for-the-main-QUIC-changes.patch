@@ -27,8 +27,10 @@ Update referenced I-D versions.
  util/libssl.num                      |  2 +-
  17 files changed, 155 insertions(+), 104 deletions(-)
 
---- a/doc/man3/SSL_CTX_set_quic_method.pod
-+++ b/doc/man3/SSL_CTX_set_quic_method.pod
+Index: openssl-3.0.19/doc/man3/SSL_CTX_set_quic_method.pod
+===================================================================
+--- openssl-3.0.19.orig/doc/man3/SSL_CTX_set_quic_method.pod
++++ openssl-3.0.19/doc/man3/SSL_CTX_set_quic_method.pod
 @@ -63,22 +63,25 @@ SSL_quic_max_handshake_flight_len() retu
  that may be received at the given encryption level. This function should be
  used to limit buffering in the QUIC implementation.
@@ -119,34 +121,10 @@ Update referenced I-D versions.
  
  SSL_is_quic() returns 1 if QUIC is being used, 0 if not.
  
---- a/include/openssl/ssl.h.in
-+++ b/include/openssl/ssl.h.in
-@@ -2562,10 +2562,10 @@ __owur int SSL_process_quic_post_handsha
- 
- __owur int SSL_is_quic(SSL *ssl);
- 
--#  endif
--
- int SSL_CIPHER_get_prf_nid(const SSL_CIPHER *c);
- 
-+#  endif
-+
- # ifdef  __cplusplus
- }
- # endif
---- a/include/openssl/tls1.h
-+++ b/include/openssl/tls1.h
-@@ -151,7 +151,7 @@ extern "C" {
- /* Temporary extension type */
- # define TLSEXT_TYPE_renegotiate                 0xff01
- 
--/* ExtensionType value from draft-ietf-quic-tls-13 */
-+/* ExtensionType value from draft-ietf-quic-tls-27 */
- # define TLSEXT_TYPE_quic_transport_parameters   0xffa5
- 
- # ifndef OPENSSL_NO_NEXTPROTONEG
---- a/ssl/build.info
-+++ b/ssl/build.info
+Index: openssl-3.0.19/ssl/build.info
+===================================================================
+--- openssl-3.0.19.orig/ssl/build.info
++++ openssl-3.0.19/ssl/build.info
 @@ -37,10 +37,11 @@ IF[{- !$disabled{'deprecated-3.0'} -}]
    SHARED_SOURCE[../libssl]=s3_cbc.c
    SOURCE[../libssl]=ssl_rsa_legacy.c
@@ -162,9 +140,11 @@ Update referenced I-D versions.
 +
  SOURCE[../providers/libcommon.a]=record/tls_pad.c
  SOURCE[../providers/libdefault.a ../providers/libfips.a]=s3_cbc.c
---- a/ssl/ssl_ciph.c
-+++ b/ssl/ssl_ciph.c
-@@ -2241,6 +2241,7 @@ const char *OSSL_default_ciphersuites(vo
+Index: openssl-3.0.19/ssl/ssl_ciph.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_ciph.c
++++ openssl-3.0.19/ssl/ssl_ciph.c
+@@ -2227,6 +2227,7 @@ const char *OSSL_default_ciphersuites(vo
             "TLS_AES_128_GCM_SHA256";
  }
  
@@ -172,14 +152,16 @@ Update referenced I-D versions.
  int SSL_CIPHER_get_prf_nid(const SSL_CIPHER *c)
  {
      switch (c->algorithm2 & (0xFF << TLS1_PRF_DGST_SHIFT)) {
-@@ -2272,3 +2273,4 @@ int SSL_CIPHER_get_prf_nid(const SSL_CIP
+@@ -2258,3 +2259,4 @@ int SSL_CIPHER_get_prf_nid(const SSL_CIP
      }
      return NID_undef;
  }
 +#endif
---- a/ssl/ssl_lib.c
-+++ b/ssl/ssl_lib.c
-@@ -4281,7 +4281,7 @@ EVP_PKEY *SSL_CTX_get0_privatekey(const
+Index: openssl-3.0.19/ssl/ssl_lib.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_lib.c
++++ openssl-3.0.19/ssl/ssl_lib.c
+@@ -4240,7 +4240,7 @@ EVP_PKEY *SSL_CTX_get0_privatekey(const
  
  const SSL_CIPHER *SSL_get_current_cipher(const SSL *s)
  {
@@ -188,9 +170,11 @@ Update referenced I-D versions.
          return s->session->cipher;
      return NULL;
  }
---- a/ssl/ssl_local.h
-+++ b/ssl/ssl_local.h
-@@ -1227,6 +1227,7 @@ struct quic_data_st {
+Index: openssl-3.0.19/ssl/ssl_local.h
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_local.h
++++ openssl-3.0.19/ssl/ssl_local.h
+@@ -1240,6 +1240,7 @@ struct quic_data_st {
      OSSL_ENCRYPTION_LEVEL level;
      size_t offset;
      size_t length;
@@ -198,8 +182,10 @@ Update referenced I-D versions.
  };
  typedef struct quic_data_st QUIC_DATA;
  int quic_set_encryption_secrets(SSL *ssl, OSSL_ENCRYPTION_LEVEL level);
---- a/ssl/ssl_quic.c
-+++ b/ssl/ssl_quic.c
+Index: openssl-3.0.19/ssl/ssl_quic.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/ssl_quic.c
++++ openssl-3.0.19/ssl/ssl_quic.c
 @@ -11,10 +11,6 @@
  #include "internal/cryptlib.h"
  #include "internal/refcount.h"
@@ -302,9 +288,11 @@ Update referenced I-D versions.
  }
 -
 -#endif
---- a/ssl/statem/extensions_clnt.c
-+++ b/ssl/statem/extensions_clnt.c
-@@ -1947,7 +1947,7 @@ int tls_parse_stoc_early_data(SSL *s, PA
+Index: openssl-3.0.19/ssl/statem/extensions_clnt.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/extensions_clnt.c
++++ openssl-3.0.19/ssl/statem/extensions_clnt.c
+@@ -1945,7 +1945,7 @@ int tls_parse_stoc_early_data(SSL *s, PA
  #ifndef OPENSSL_NO_QUIC
          /*
           * QUIC server must send 0xFFFFFFFF or it's a PROTOCOL_VIOLATION
@@ -313,9 +301,11 @@ Update referenced I-D versions.
           */
          if (s->quic_method != NULL && max_early_data != 0xFFFFFFFF) {
              SSLfatal(s, SSL_AD_ILLEGAL_PARAMETER, SSL_R_INVALID_MAX_EARLY_DATA);
---- a/ssl/statem/extensions_srvr.c
-+++ b/ssl/statem/extensions_srvr.c
-@@ -1914,7 +1914,7 @@ EXT_RETURN tls_construct_stoc_early_data
+Index: openssl-3.0.19/ssl/statem/extensions_srvr.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/extensions_srvr.c
++++ openssl-3.0.19/ssl/statem/extensions_srvr.c
+@@ -1916,7 +1916,7 @@ EXT_RETURN tls_construct_stoc_early_data
              return EXT_RETURN_NOT_SENT;
  
  #ifndef OPENSSL_NO_QUIC
@@ -324,9 +314,11 @@ Update referenced I-D versions.
          if (s->quic_method != NULL)
              max_early_data = 0xFFFFFFFF;
  #endif
---- a/ssl/statem/statem.c
-+++ b/ssl/statem/statem.c
-@@ -585,6 +585,7 @@ static SUB_STATE_RETURN read_state_machi
+Index: openssl-3.0.19/ssl/statem/statem.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem.c
++++ openssl-3.0.19/ssl/statem/statem.c
+@@ -584,6 +584,7 @@ static SUB_STATE_RETURN read_state_machi
                  ret = dtls_get_message(s, &mt);
  #ifndef OPENSSL_NO_QUIC
              } else if (SSL_IS_QUIC(s)) {
@@ -334,7 +326,7 @@ Update referenced I-D versions.
                  ret = quic_get_message(s, &mt, &len);
  #endif
              } else {
-@@ -929,7 +930,6 @@ int statem_flush(SSL *s)
+@@ -927,7 +928,6 @@ int statem_flush(SSL *s)
  #ifndef OPENSSL_NO_QUIC
      if (SSL_IS_QUIC(s)) {
          if (!s->quic_method->flush_flight(s)) {
@@ -342,8 +334,10 @@ Update referenced I-D versions.
              SSLerr(SSL_F_STATEM_FLUSH, ERR_R_INTERNAL_ERROR);
              return 0;
          }
---- a/ssl/statem/statem_lib.c
-+++ b/ssl/statem/statem_lib.c
+Index: openssl-3.0.19/ssl/statem/statem_lib.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem_lib.c
++++ openssl-3.0.19/ssl/statem/statem_lib.c
 @@ -44,17 +44,24 @@ int ssl3_do_write(SSL *s, int type)
  {
      int ret;
@@ -384,10 +378,12 @@ Update referenced I-D versions.
          while (s->init_num < SSL3_HM_HEADER_LENGTH) {
 -            /* QUIC: either create a special ssl_read_bytes... or if/else this */
              i = s->method->ssl_read_bytes(s, SSL3_RT_HANDSHAKE, &recvd_type,
-                                           &p[s->init_num],
-                                           SSL3_HM_HEADER_LENGTH - s->init_num,
---- a/ssl/statem/statem_local.h
-+++ b/ssl/statem/statem_local.h
+                 &p[s->init_num],
+                 SSL3_HM_HEADER_LENGTH - s->init_num,
+Index: openssl-3.0.19/ssl/statem/statem_local.h
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem_local.h
++++ openssl-3.0.19/ssl/statem/statem_local.h
 @@ -104,7 +104,9 @@ __owur int tls_get_message_header(SSL *s
  __owur int tls_get_message_body(SSL *s, size_t *len);
  __owur int dtls_get_message(SSL *s, int *mt);
@@ -398,8 +394,10 @@ Update referenced I-D versions.
  
  /* Message construction and processing functions */
  __owur int tls_process_initial_server_flight(SSL *s);
---- a/ssl/statem/statem_quic.c
-+++ b/ssl/statem/statem_quic.c
+Index: openssl-3.0.19/ssl/statem/statem_quic.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/statem/statem_quic.c
++++ openssl-3.0.19/ssl/statem/statem_quic.c
 @@ -11,10 +11,6 @@
  #include "statem_local.h"
  #include "internal/cryptlib.h"
@@ -458,9 +456,11 @@ Update referenced I-D versions.
  }
 -
 -#endif
---- a/ssl/tls13_enc.c
-+++ b/ssl/tls13_enc.c
-@@ -419,6 +419,7 @@ static const unsigned char exporter_mast
+Index: openssl-3.0.19/ssl/tls13_enc.c
+===================================================================
+--- openssl-3.0.19.orig/ssl/tls13_enc.c
++++ openssl-3.0.19/ssl/tls13_enc.c
+@@ -418,6 +418,7 @@ static const unsigned char exporter_mast
  static const unsigned char resumption_master_secret[] = "res master";
  static const unsigned char early_exporter_master_secret[] = "e exp master";
  #endif
@@ -468,7 +468,7 @@ Update referenced I-D versions.
  #ifndef OPENSSL_NO_QUIC
  static int quic_change_cipher_state(SSL *s, int which)
  {
-@@ -427,7 +428,7 @@ static int quic_change_cipher_state(SSL
+@@ -426,7 +427,7 @@ static int quic_change_cipher_state(SSL
      int hashleni;
      int ret = 0;
      const EVP_MD *md = NULL;
@@ -477,7 +477,7 @@ Update referenced I-D versions.
      int is_handshake = ((which & SSL3_CC_HANDSHAKE) == SSL3_CC_HANDSHAKE);
      int is_client_read = ((which & SSL3_CHANGE_CIPHER_CLIENT_READ) == SSL3_CHANGE_CIPHER_CLIENT_READ);
      int is_server_write = ((which & SSL3_CHANGE_CIPHER_SERVER_WRITE) == SSL3_CHANGE_CIPHER_SERVER_WRITE);
-@@ -450,34 +451,62 @@ static int quic_change_cipher_state(SSL
+@@ -449,34 +450,62 @@ static int quic_change_cipher_state(SSL
  
      if (is_client_read || is_server_write) {
          if (is_handshake) {
@@ -558,7 +558,7 @@ Update referenced I-D versions.
                  /* SSLfatal() already called */
                  goto err;
              }
-@@ -497,9 +526,11 @@ static int quic_change_cipher_state(SSL
+@@ -496,9 +525,11 @@ static int quic_change_cipher_state(SSL
              level = ssl_encryption_early_data;
  
              if (!tls13_hkdf_expand(s, md, s->early_secret, client_early_traffic,
@@ -573,7 +573,7 @@ Update referenced I-D versions.
                  || !quic_set_encryption_secrets(s, level)) {
                  /* SSLfatal() already called */
                  goto err;
-@@ -512,9 +543,11 @@ static int quic_change_cipher_state(SSL
+@@ -511,9 +542,11 @@ static int quic_change_cipher_state(SSL
               * We also create the resumption master secret, but this time use the
               * hash for the whole handshake including the Client Finished
               */
@@ -588,7 +588,7 @@ Update referenced I-D versions.
                  /* SSLfatal() already called */
                  goto err;
              }
-@@ -531,6 +564,7 @@ static int quic_change_cipher_state(SSL
+@@ -530,6 +563,7 @@ static int quic_change_cipher_state(SSL
      return ret;
  }
  #endif /* OPENSSL_NO_QUIC */
@@ -596,9 +596,11 @@ Update referenced I-D versions.
  int tls13_change_cipher_state(SSL *s, int which)
  {
      unsigned char *iv;
---- a/test/sslapitest.c
-+++ b/test/sslapitest.c
-@@ -10766,9 +10766,11 @@ static int test_multi_resume(int idx)
+Index: openssl-3.0.19/test/sslapitest.c
+===================================================================
+--- openssl-3.0.19.orig/test/sslapitest.c
++++ openssl-3.0.19/test/sslapitest.c
+@@ -10865,9 +10865,11 @@ end:
  }
  
  #ifndef OPENSSL_NO_QUIC
@@ -612,7 +614,7 @@ Update referenced I-D versions.
  {
      test_printf_stderr("quic_set_encryption_secrets() %s, lvl=%d, len=%zd\n",
                         ssl->server ? "server" : "client", level, secret_len);
-@@ -10780,11 +10782,12 @@ static int test_quic_add_handshake_data(
+@@ -10879,11 +10881,12 @@ static int test_quic_add_handshake_data(
  {
      SSL *peer = (SSL*)SSL_get_app_data(ssl);
  
@@ -627,8 +629,10 @@ Update referenced I-D versions.
      if (!TEST_true(SSL_provide_quic_data(peer, level, data, len))) {
          ERR_print_errors_fp(stderr);
          return 0;
---- a/util/libssl.num
-+++ b/util/libssl.num
+Index: openssl-3.0.19/util/libssl.num
+===================================================================
+--- openssl-3.0.19.orig/util/libssl.num
++++ openssl-3.0.19/util/libssl.num
 @@ -522,7 +522,7 @@ SSL_CTX_set0_tmp_dh_pkey
  SSL_group_to_name                       523	3_0_0	EXIST::FUNCTION:
  SSL_quic_read_level                     20000	3_0_0	EXIST::FUNCTION:QUIC
