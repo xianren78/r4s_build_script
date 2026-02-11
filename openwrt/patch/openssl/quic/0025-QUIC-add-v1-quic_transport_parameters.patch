@@ -88,10 +88,11 @@ Index: openssl-3.0.19/include/openssl/ssl.h.in
 ===================================================================
 --- openssl-3.0.19.orig/include/openssl/ssl.h.in
 +++ openssl-3.0.19/include/openssl/ssl.h.in
-@@ -2569,6 +2569,19 @@ __owur int SSL_process_quic_post_handsha
+@@ -2569,10 +2569,24 @@ __owur int SSL_process_quic_post_handsha
  
  __owur int SSL_is_quic(SSL *ssl);
  
+-#  endif
 +/* BoringSSL API */
 +__owur void SSL_set_quic_use_legacy_codepoint(SSL *ssl, int use_legacy);
 +
@@ -105,9 +106,14 @@ Index: openssl-3.0.19/include/openssl/ssl.h.in
 +/* Returns the negotiated version, or -1 on error */
 +__owur int SSL_get_peer_quic_transport_version(const SSL *ssl);
 +
+ 
  int SSL_CIPHER_get_prf_nid(const SSL_CIPHER *c);
  
- #  endif
++#  endif
++
+ #ifdef __cplusplus
+ }
+ #endif
 Index: openssl-3.0.19/include/openssl/sslerr.h
 ===================================================================
 --- openssl-3.0.19.orig/include/openssl/sslerr.h
@@ -124,11 +130,13 @@ Index: openssl-3.0.19/include/openssl/tls1.h
 ===================================================================
 --- openssl-3.0.19.orig/include/openssl/tls1.h
 +++ openssl-3.0.19/include/openssl/tls1.h
-@@ -151,7 +151,8 @@ extern "C" {
+@@ -150,8 +150,9 @@ extern "C" {
+ /* Temporary extension type */
  #define TLSEXT_TYPE_renegotiate 0xff01
  
- /* ExtensionType value from draft-ietf-quic-tls-27 */
+-/* ExtensionType value from draft-ietf-quic-tls-13 */
 -# define TLSEXT_TYPE_quic_transport_parameters   0xffa5
++ /* ExtensionType value from draft-ietf-quic-tls-27 */
 +# define TLSEXT_TYPE_quic_transport_parameters_draft   0xffa5
 +# define TLSEXT_TYPE_quic_transport_parameters         0x0039
  

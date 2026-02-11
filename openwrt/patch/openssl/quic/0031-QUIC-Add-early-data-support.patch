@@ -57,7 +57,7 @@ Index: openssl-3.0.19/include/openssl/ssl.h.in
 ===================================================================
 --- openssl-3.0.19.orig/include/openssl/ssl.h.in
 +++ openssl-3.0.19/include/openssl/ssl.h.in
-@@ -2584,6 +2584,8 @@ __owur int SSL_get_peer_quic_transport_v
+@@ -2585,6 +2585,8 @@ __owur int SSL_get_peer_quic_transport_v
  
  int SSL_CIPHER_get_prf_nid(const SSL_CIPHER *c);
  
