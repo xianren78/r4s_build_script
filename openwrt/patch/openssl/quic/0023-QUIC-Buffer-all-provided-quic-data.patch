@@ -28,7 +28,7 @@ of the TLS handshake messages themselves.
 
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
-@@ -1260,6 +1260,7 @@ void SSL_free(SSL *s)
+@@ -1246,6 +1246,7 @@ void SSL_free(SSL *s)
  #ifndef OPENSSL_NO_QUIC
      OPENSSL_free(s->ext.quic_transport_params);
      OPENSSL_free(s->ext.peer_quic_transport_params);
@@ -38,7 +38,7 @@ of the TLS handshake messages themselves.
  
 --- a/ssl/ssl_local.h
 +++ b/ssl/ssl_local.h
-@@ -1225,9 +1225,8 @@ typedef struct cert_pkey_st CERT_PKEY;
+@@ -1238,9 +1238,8 @@ typedef struct cert_pkey_st CERT_PKEY;
  struct quic_data_st {
      struct quic_data_st *next;
      OSSL_ENCRYPTION_LEVEL level;
@@ -49,7 +49,7 @@ of the TLS handshake messages themselves.
  };
  typedef struct quic_data_st QUIC_DATA;
  int quic_set_encryption_secrets(SSL *ssl, OSSL_ENCRYPTION_LEVEL level);
-@@ -1721,8 +1720,10 @@ struct ssl_st {
+@@ -1735,8 +1734,10 @@ struct ssl_st {
  #ifndef OPENSSL_NO_QUIC
      OSSL_ENCRYPTION_LEVEL quic_read_level;
      OSSL_ENCRYPTION_LEVEL quic_write_level;

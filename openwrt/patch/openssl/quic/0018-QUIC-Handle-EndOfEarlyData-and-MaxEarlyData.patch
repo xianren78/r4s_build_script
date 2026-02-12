@@ -12,7 +12,7 @@ Subject: [PATCH 18/43] QUIC: Handle EndOfEarlyData and MaxEarlyData
 
 --- a/ssl/statem/extensions_clnt.c
 +++ b/ssl/statem/extensions_clnt.c
-@@ -1944,6 +1944,17 @@ int tls_parse_stoc_early_data(SSL *s, PA
+@@ -1942,6 +1942,17 @@ int tls_parse_stoc_early_data(SSL *s, PA
              return 0;
          }
  
@@ -32,8 +32,8 @@ Subject: [PATCH 18/43] QUIC: Handle EndOfEarlyData and MaxEarlyData
          return 1;
 --- a/ssl/statem/extensions_srvr.c
 +++ b/ssl/statem/extensions_srvr.c
-@@ -1908,12 +1908,20 @@ EXT_RETURN tls_construct_stoc_early_data
-                                          size_t chainidx)
+@@ -1910,12 +1910,20 @@ EXT_RETURN tls_construct_stoc_early_data
+     size_t chainidx)
  {
      if (context == SSL_EXT_TLS1_3_NEW_SESSION_TICKET) {
 -        if (s->max_early_data == 0)
@@ -49,15 +49,15 @@ Subject: [PATCH 18/43] QUIC: Handle EndOfEarlyData and MaxEarlyData
 +#endif
 +
          if (!WPACKET_put_bytes_u16(pkt, TLSEXT_TYPE_early_data)
-                 || !WPACKET_start_sub_packet_u16(pkt)
--                || !WPACKET_put_bytes_u32(pkt, s->max_early_data)
+             || !WPACKET_start_sub_packet_u16(pkt)
+-            || !WPACKET_put_bytes_u32(pkt, s->max_early_data)
 +                || !WPACKET_put_bytes_u32(pkt, max_early_data)
-                 || !WPACKET_close(pkt)) {
+             || !WPACKET_close(pkt)) {
              SSLfatal(s, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);
              return EXT_RETURN_FAIL;
 --- a/ssl/statem/statem_clnt.c
 +++ b/ssl/statem/statem_clnt.c
-@@ -904,6 +904,14 @@ int ossl_statem_client_construct_message
+@@ -902,6 +902,14 @@ int ossl_statem_client_construct_message
          break;
  
      case TLS_ST_CW_END_OF_EARLY_DATA:

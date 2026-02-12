@@ -12,27 +12,27 @@ Subject: [PATCH 30/43] QUIC: Add compile/run-time checking for QUIC
 
 --- a/apps/info.c
 +++ b/apps/info.c
-@@ -15,6 +15,9 @@ typedef enum OPTION_choice {
-     OPT_COMMON,
-     OPT_CONFIGDIR, OPT_ENGINESDIR, OPT_MODULESDIR, OPT_DSOEXT, OPT_DIRNAMESEP,
-     OPT_LISTSEP, OPT_SEEDS, OPT_CPUSETTINGS
+@@ -21,6 +21,9 @@ typedef enum OPTION_choice {
+     OPT_LISTSEP,
+     OPT_SEEDS,
+     OPT_CPUSETTINGS
 +#ifndef OPENSSL_NO_QUIC
 +    , OPT_QUIC
 +#endif
  } OPTION_CHOICE;
  
  const OPTIONS info_options[] = {
-@@ -32,6 +35,9 @@ const OPTIONS info_options[] = {
-     {"listsep", OPT_LISTSEP, '-', "List separator character"},
-     {"seeds", OPT_SEEDS, '-', "Seed sources"},
-     {"cpusettings", OPT_CPUSETTINGS, '-', "CPU settings info"},
+@@ -38,6 +41,9 @@ const OPTIONS info_options[] = {
+     { "listsep", OPT_LISTSEP, '-', "List separator character" },
+     { "seeds", OPT_SEEDS, '-', "Seed sources" },
+     { "cpusettings", OPT_CPUSETTINGS, '-', "CPU settings info" },
 +#ifndef OPENSSL_NO_QUIC
 +    {"quic", OPT_QUIC, '-', "QUIC info"},
 +#endif
-     {NULL}
+     { NULL }
  };
  
-@@ -84,6 +90,12 @@ opthelp:
+@@ -90,6 +96,12 @@ int info_main(int argc, char **argv)
              type = OPENSSL_INFO_CPU_SETTINGS;
              dirty++;
              break;
@@ -47,7 +47,7 @@ Subject: [PATCH 30/43] QUIC: Add compile/run-time checking for QUIC
      if (opt_num_rest() != 0)
 --- a/crypto/info.c
 +++ b/crypto/info.c
-@@ -199,6 +199,10 @@ const char *OPENSSL_info(int t)
+@@ -206,6 +206,10 @@ const char *OPENSSL_info(int t)
          if (ossl_cpu_info_str[0] != '\0')
              return ossl_cpu_info_str + strlen(CPUINFO_PREFIX);
          break;
@@ -77,9 +77,9 @@ Subject: [PATCH 30/43] QUIC: Add compile/run-time checking for QUIC
  For an unknown I<t>, NULL is returned.
 --- a/include/openssl/crypto.h.in
 +++ b/include/openssl/crypto.h.in
-@@ -176,6 +176,10 @@ const char *OPENSSL_info(int type);
- # define OPENSSL_INFO_SEED_SOURCE               1007
- # define OPENSSL_INFO_CPU_SETTINGS              1008
+@@ -180,6 +180,10 @@ const char *OPENSSL_info(int type);
+ #define OPENSSL_INFO_SEED_SOURCE 1007
+ #define OPENSSL_INFO_CPU_SETTINGS 1008
  
 +# ifndef OPENSSL_NO_QUIC
 +#  define OPENSSL_INFO_QUIC                     2000

@@ -163,8 +163,8 @@ pushd feeds/luci
 popd
 
 # openssl
-OPENSSL_VERSION=3.0.17
-OPENSSL_HASH=dfdd77e4ea1b57ff3a6dbde6b0bdc3f31db5ac99e7fdd4eaf9e1fbb6ec2db8ce
+OPENSSL_VERSION=3.0.19
+OPENSSL_HASH=fa5a4143b8aae18be53ef2f3caf29a2e0747430b8bc74d32d88335b94ab63072
 sed -ri "s/(PKG_VERSION:=)[^\"]*/\1$OPENSSL_VERSION/;s/(PKG_HASH:=)[^\"]*/\1$OPENSSL_HASH/" package/libs/openssl/Makefile
 
 # openssl - quictls

@@ -9,7 +9,7 @@ Subject: [PATCH 40/43] QUIC: Error when non-empty session_id in CH
 
 --- a/ssl/statem/statem_srvr.c
 +++ b/ssl/statem/statem_srvr.c
-@@ -1566,6 +1566,15 @@ MSG_PROCESS_RETURN tls_process_client_he
+@@ -1574,6 +1574,15 @@ MSG_PROCESS_RETURN tls_process_client_he
                  goto err;
              }
          }

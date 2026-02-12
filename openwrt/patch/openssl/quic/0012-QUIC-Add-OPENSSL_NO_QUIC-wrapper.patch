@@ -9,7 +9,7 @@ Subject: [PATCH 12/43] QUIC: Add OPENSSL_NO_QUIC wrapper
 
 --- a/ssl/ssl_local.h
 +++ b/ssl/ssl_local.h
-@@ -1491,9 +1491,11 @@ struct ssl_st {
+@@ -1504,9 +1504,11 @@ struct ssl_st {
      unsigned char handshake_traffic_hash[EVP_MAX_MD_SIZE];
      unsigned char client_app_traffic_secret[EVP_MAX_MD_SIZE];
      unsigned char server_app_traffic_secret[EVP_MAX_MD_SIZE];

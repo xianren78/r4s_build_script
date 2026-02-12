@@ -10,7 +10,7 @@ Subject: [PATCH 43/43] QUIC: Fix extension test
 
 --- a/ssl/ssl_local.h
 +++ b/ssl/ssl_local.h
-@@ -773,8 +773,8 @@ typedef enum tlsext_index_en {
+@@ -786,8 +786,8 @@ typedef enum tlsext_index_en {
      TLSEXT_IDX_cryptopro_bug,
      TLSEXT_IDX_early_data,
      TLSEXT_IDX_certificate_authorities,

@@ -10,7 +10,7 @@ Subject: [PATCH 06/43] QUIC: Handle partial handshake messages
 
 --- a/ssl/ssl_local.h
 +++ b/ssl/ssl_local.h
-@@ -1225,6 +1225,7 @@ typedef struct cert_pkey_st CERT_PKEY;
+@@ -1238,6 +1238,7 @@ typedef struct cert_pkey_st CERT_PKEY;
  struct quic_data_st {
      struct quic_data_st *next;
      OSSL_ENCRYPTION_LEVEL level;

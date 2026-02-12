@@ -11,11 +11,11 @@ This reverts commit 4836c042d500da503b7f50db2aa65e0bfea1c451.
 
 --- a/apps/speed.c
 +++ b/apps/speed.c
-@@ -2378,7 +2378,7 @@ skip_hmac:
+@@ -2443,7 +2443,7 @@ skip_hmac:
  
                      if (!ae_mode) {
                          if (!EVP_CipherInit_ex(loopargs[k].ctx, NULL, NULL,
--                                               loopargs[k].key, iv, -1)) {
+-                                loopargs[k].key, iv, -1)) {
 +                                               loopargs[k].key, NULL, -1)) {
                              BIO_printf(bio_err, "\nFailed to set the key\n");
                              ERR_print_errors(bio_err);

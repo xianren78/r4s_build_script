@@ -12,7 +12,7 @@ As DTLS has changed, so too must QUIC.
 
 --- a/ssl/statem/statem.c
 +++ b/ssl/statem/statem.c
-@@ -586,7 +586,7 @@ static SUB_STATE_RETURN read_state_machi
+@@ -585,7 +585,7 @@ static SUB_STATE_RETURN read_state_machi
  #ifndef OPENSSL_NO_QUIC
              } else if (SSL_IS_QUIC(s)) {
                  /* QUIC behaves like DTLS -- all in one go. */
@@ -21,7 +21,7 @@ As DTLS has changed, so too must QUIC.
  #endif
              } else {
                  ret = tls_get_message_header(s, &mt);
-@@ -636,8 +636,11 @@ static SUB_STATE_RETURN read_state_machi
+@@ -634,8 +634,11 @@ static SUB_STATE_RETURN read_state_machi
                   * opportunity to do any further processing.
                   */
                  ret = dtls_get_message_body(s, &len);

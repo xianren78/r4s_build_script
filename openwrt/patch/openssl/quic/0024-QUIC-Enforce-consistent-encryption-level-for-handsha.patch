@@ -13,7 +13,7 @@ encryption level boundaries, but we were not previously enforcing this.
 
 --- a/ssl/ssl_local.h
 +++ b/ssl/ssl_local.h
-@@ -1720,6 +1720,7 @@ struct ssl_st {
+@@ -1734,6 +1734,7 @@ struct ssl_st {
  #ifndef OPENSSL_NO_QUIC
      OSSL_ENCRYPTION_LEVEL quic_read_level;
      OSSL_ENCRYPTION_LEVEL quic_write_level;
