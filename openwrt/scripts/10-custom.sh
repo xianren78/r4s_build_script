@@ -20,6 +20,16 @@ rm -f target/linux/generic/pending-6.18/620-net_sched-codel-do-not-defer-queue-l
 rm -f target/linux/generic/pending-6.12/730-net-ethernet-mtk_eth_soc-reset-all-TX-queues-on-DMA-.patch
 rm -f target/linux/generic/pending-6.18/730-net-ethernet-mtk_eth_soc-reset-all-TX-queues-on-DMA-.patch
 
+#openssl 3.0.19
+rm -f package/libs/openssl/patches/140-allow-prefer-chacha20.patch
+rm -f package/libs/openssl/patches/500-e_devcrypto-default-to-not-use-digests-in-engine.patch
+rm -f package/libs/openssl/patches/510-e_devcrypto-ignore-error-when-closing-session.patch
+pushd package/libs/openssl/patches
+	curl -s -f -L -O https://github.com/openwrt/openwrt/raw/refs/heads/openwrt-24.10/package/libs/openssl/patches/140-allow-prefer-chacha20.patch
+	curl -s -f -L -O https://github.com/openwrt/openwrt/raw/refs/heads/openwrt-24.10/package/libs/openssl/patches/500-e_devcrypto-default-to-not-use-digests-in-engine.patch
+	curl -s -f -L -O https://github.com/openwrt/openwrt/raw/refs/heads/openwrt-24.10/package/libs/openssl/patches/510-e_devcrypto-ignore-error-when-closing-session.patch
+popd
+
 # add openwrt-nikki
 rm -rf package/new/helloworld/luci-app-nikki
 rm -rf package/new/helloworld/nikki
