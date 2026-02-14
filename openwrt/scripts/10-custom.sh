@@ -20,6 +20,9 @@ rm -f target/linux/generic/pending-6.18/620-net_sched-codel-do-not-defer-queue-l
 rm -f target/linux/generic/pending-6.12/730-net-ethernet-mtk_eth_soc-reset-all-TX-queues-on-DMA-.patch
 rm -f target/linux/generic/pending-6.18/730-net-ethernet-mtk_eth_soc-reset-all-TX-queues-on-DMA-.patch
 
+# no 8261n in op 24.10
+rm -f target/linux/generic/hack-6.18/735-net-phy-realtek-rtl8261n.patch
+
 #openssl 3.0.19
 rm -f package/libs/openssl/patches/140-allow-prefer-chacha20.patch
 rm -f package/libs/openssl/patches/500-e_devcrypto-default-to-not-use-digests-in-engine.patch
