@@ -47,9 +47,14 @@ if [ "$(whoami)" = "sbwml" ]; then
 	git clone https://$gitea/sbwml/target_linux_generic -b openwrt-25.12 target/linux/generic-6.18 --depth=1
 else
 #        git clone https://"$git_name":"$git_password"@$gitea/sbwml/target_linux_generic -b openwrt-24.10 target/linux/generic-6.18 --depth=1
-	git clone https://$git_targetnew@$github/xianren78/target_linux_generic -b openwrt-24.10 target/linux/generic-6.18 --depth=1
+	#git clone https://$git_targetnew@$github/xianren78/target_linux_generic -b openwrt-24.10 target/linux/generic-6.18 --depth=1
+	git clone --depth=1 --single-branch -b openwrt-25.12   "https://${git_targetnew}@${github}/xianren78/target_linux_generic"   target/linux/generic-6.18
 fi
-cp -a target/linux/generic-6.18/* target/linux/generic
+echo "=== target/linux/generic-6.18 repo info ==="
+git -C target/linux/generic-6.18 rev-parse --is-inside-work-tree
+echo "branch: $(git -C target/linux/generic-6.18 rev-parse --abbrev-ref HEAD)"
+echo "commit: $(git -C target/linux/generic-6.18 log -1 --oneline)"
+cp -a target/linux/generic-6.18/* target/linux/generic/
 
 # kernel modules
 rm -rf package/kernel/linux
