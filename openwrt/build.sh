@@ -36,11 +36,7 @@ ip_info=`curl -sk https://ip.cooluc.com`;
 [ -n "$ip_info" ] && export isCN=`echo $ip_info | grep -Po 'country_code\":"\K[^"]+'` || export isCN=US
 
 # script url
-if [ "$isCN" = "CN" ]; then
-    export mirror=https://init.cooluc.com
-else
-    export mirror=https://init2.cooluc.com
-fi
+export mirror=https://init.cooluc.com
 
 # github actions - caddy server
 if [ "$(whoami)" = "runner" ] && [ "$git_name" != "private" ]; then

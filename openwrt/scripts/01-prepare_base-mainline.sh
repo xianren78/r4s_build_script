@@ -26,7 +26,7 @@ curl -s $mirror/openwrt/patch/openwrt-6.x/x86/patches-6.18/100-fix_cs5535_clocke
 curl -s $mirror/openwrt/patch/openwrt-6.x/x86/patches-6.18/103-pcengines_apu6_platform.patch > target/linux/x86/patches-6.18/103-pcengines_apu6_platform.patch
 ## x86_64 - target
 sed -ri "s/(KERNEL_PATCHVER:=)[^\"]*/\16.18/" target/linux/x86/Makefile
-sed -i '/KERNEL_PATCHVER/a\KERNEL_TESTING_PATCHVER:=6.6' target/linux/x86/Makefile
+sed -i '/KERNEL_PATCHVER/a\KERNEL_TESTING_PATCHVER:=6.12' target/linux/x86/Makefile
 curl -s $mirror/openwrt/patch/openwrt-6.x/x86/base-files/etc/board.d/01_leds > target/linux/x86/base-files/etc/board.d/01_leds
 curl -s $mirror/openwrt/patch/openwrt-6.x/x86/base-files/etc/board.d/02_network > target/linux/x86/base-files/etc/board.d/02_network
 
@@ -35,25 +35,19 @@ rm -rf target/linux/armsr
 git clone https://$git_targetnew@$github/xianren78/target_linux_armsr target/linux/armsr -b v6.18
 
 # kernel - 6.18
-curl -s $mirror/tags/kernel-6.18 > include/kernel-6.18
+curl -s $mirror/tags/kernel-6.18 > target/linux/generic/kernel-6.18
 
 # kenrel Vermagic
 sed -ie 's/^\(.\).*vermagic$/\1cp $(TOPDIR)\/.vermagic $(LINUX_DIR)\/.vermagic/' include/kernel-defaults.mk
-grep HASH include/kernel-6.18 | awk -F'HASH-' '{print $2}' | awk '{print $1}' | md5sum | awk '{print $1}' > .vermagic
+grep HASH target/linux/generic/kernel-6.18 | awk -F'HASH-' '{print $2}' | awk '{print $1}' | md5sum | awk '{print $1}' > .vermagic
 
 # kernel generic patches
 curl -s $mirror/openwrt/patch/kernel-6.18/openwrt/linux-6.18-target-linux-generic.patch | patch -p1
-local_kernel_version=$(sed -n 's/^LINUX_KERNEL_HASH-\([0-9.]\+\) = .*/\1/p' include/kernel-6.18)
-release_kernel_version=$(curl -sL https://raw.githubusercontent.com/sbwml/r4s_build_script/master/tags/kernel-6.18 | sed -n 's/^LINUX_KERNEL_HASH-\([0-9.]\+\) = .*/\1/p')
-if [ "$local_kernel_version" = "$release_kernel_version" ] && [ -z "$git_password" ] && [ "$(whoami)" != "sbwml" ]; then
-    git clone https://$github/sbwml/target_linux_generic -b openwrt-24.10 target/linux/generic-6.18 --depth=1
+if [ "$(whoami)" = "sbwml" ]; then
+	git clone https://$gitea/sbwml/target_linux_generic -b openwrt-25.12 target/linux/generic-6.18 --depth=1
 else
-    if [ "$(whoami)" = "sbwml" ]; then
-        git clone https://$gitea/sbwml/target_linux_generic -b openwrt-24.10 target/linux/generic-6.18 --depth=1
-    else
 #        git clone https://"$git_name":"$git_password"@$gitea/sbwml/target_linux_generic -b openwrt-24.10 target/linux/generic-6.18 --depth=1
-        git clone https://$git_targetnew@$github/xianren78/target_linux_generic -b openwrt-24.10 target/linux/generic-6.18 --depth=1
-    fi
+	git clone https://$git_targetnew@$github/xianren78/target_linux_generic -b openwrt-25.12 target/linux/generic-6.18 --depth=1
 fi
 cp -a target/linux/generic-6.18/* target/linux/generic
 
@@ -63,6 +57,7 @@ git checkout package/kernel/linux
 pushd package/kernel/linux/modules
     rm -f [a-z]*.mk
     curl -Os $mirror/openwrt/patch/openwrt-6.x/modules/block.mk
+    curl -Os $mirror/openwrt/patch/openwrt-6.x/modules/bluetooth.mk
     curl -Os $mirror/openwrt/patch/openwrt-6.x/modules/can.mk
     curl -Os $mirror/openwrt/patch/openwrt-6.x/modules/crypto.mk
     curl -Os $mirror/openwrt/patch/openwrt-6.x/modules/firewire.mk
@@ -156,9 +151,9 @@ pushd target/linux/generic/hack-6.18
 popd
 
 # iproute2 - bbr3
-curl -s $mirror/openwrt/patch/iproute2/900-ss-output-TCP-BBRv3-diag-information.patch > package/network/utils/iproute2/patches/900-ss-output-TCP-BBRv3-diag-information.patch
-curl -s $mirror/openwrt/patch/iproute2/901-ip-introduce-the-ecn_low-per-route-feature.patch > package/network/utils/iproute2/patches/901-ip-introduce-the-ecn_low-per-route-feature.patch
-curl -s $mirror/openwrt/patch/iproute2/902-ss-display-ecn_low-if-tcp_info-tcpi_options-TCPI_OPT.patch > package/network/utils/iproute2/patches/902-ss-display-ecn_low-if-tcp_info-tcpi_options-TCPI_OPT.patch
+#curl -s $mirror/openwrt/patch/iproute2/900-ss-output-TCP-BBRv3-diag-information.patch > package/network/utils/iproute2/patches/900-ss-output-TCP-BBRv3-diag-information.patch
+#curl -s $mirror/openwrt/patch/iproute2/901-ip-introduce-the-ecn_low-per-route-feature.patch > package/network/utils/iproute2/patches/901-ip-introduce-the-ecn_low-per-route-feature.patch
+#curl -s $mirror/openwrt/patch/iproute2/902-ss-display-ecn_low-if-tcp_info-tcpi_options-TCPI_OPT.patch > package/network/utils/iproute2/patches/902-ss-display-ecn_low-if-tcp_info-tcpi_options-TCPI_OPT.patch
 
 # linux-firmware
 rm -rf package/firmware/linux-firmware

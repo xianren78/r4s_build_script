@@ -12,7 +12,7 @@ curl -s $mirror/openwrt/patch/packages-patches/cryptodev-linux/6.12/0006-Exclude
 curl -s $mirror/openwrt/patch/packages-patches/cryptodev-linux/6.18/900-fix-linux-6.18.patch > package/kernel/cryptodev-linux/patches/900-fix-linux-6.18.patch
 
 # gpio-button-hotplug
-curl -s $mirror/openwrt/patch/packages-patches/gpio-button-hotplug/fix-linux-6.12.patch | patch -p1
+curl -s $mirror/openwrt/patch/packages-patches/gpio-button-hotplug/fix-linux-6.18.patch | patch -p1
 
 # gpio-nct5104d
 curl -s $mirror/openwrt/patch/packages-patches/gpio-nct5104d/fix-linux-6.18.patch | patch -p1
@@ -52,9 +52,8 @@ sed -i '/ovs_kmod_openvswitch_depends/a\\t\ \ +kmod-sched-act-sample \\' feeds/p
 curl -s $mirror/openwrt/patch/packages-patches/rtpengine/900-fix-linux-6.12-11.5.1.18.patch > feeds/telephony/net/rtpengine/patches/900-fix-linux-6.12-11.5.1.18.patch
 curl -s $mirror/openwrt/patch/packages-patches/rtpengine/901-fix-build-for-linux-6.18.patch > feeds/telephony/net/rtpengine/patches/901-fix-build-for-linux-6.18.patch
 
-# ubootenv-nvram - 6.12
-mkdir -p package/kernel/ubootenv-nvram/patches
-curl -s $mirror/openwrt/patch/packages-patches/ubootenv-nvram/010-make-ubootenv_remove-return-void-for-linux-6.12.patch > package/kernel/ubootenv-nvram/patches/010-make-ubootenv_remove-return-void-for-linux-6.12.patch
+# ubootenv-nvram - 6.18
+curl -s $mirror/openwrt/patch/packages-patches/ubootenv-nvram/010-fix-build-for-linux-6.18.patch | patch -p1
 
 # usb-serial-xr_usb_serial_common: remove package
 # Now that we have packaged the upstream driver[1] and only board[2] that
