@@ -52,7 +52,7 @@ else
         git clone https://$gitea/sbwml/target_linux_generic -b openwrt-24.10 target/linux/generic-6.18 --depth=1
     else
 #        git clone https://"$git_name":"$git_password"@$gitea/sbwml/target_linux_generic -b openwrt-24.10 target/linux/generic-6.18 --depth=1
-        git clone https://$git_targetnew@$github/xianren78/target_linux_generic -b openwrt-24.10 target/linux/generic-6.18 --depth=1
+        git clone https://$git_targetnew@$github/xianren78/target_linux_generic -b openwrt-25.12 target/linux/generic-6.18 --depth=1
     fi
 fi
 cp -a target/linux/generic-6.18/* target/linux/generic
