@@ -18,13 +18,13 @@ sed -i '/USE_QUIC_OPENSSL_COMPAT/d' feeds/packages/net/haproxy/Makefile
 
 # xdp-tools
 rm -rf package/network/utils/xdp-tools
-git clone https://$github/sbwml/package_network_utils_xdp-tools package/network/utils/xdp-tools
+git clone https://$github/xianren78/package_network_utils_xdp-tools package/network/utils/xdp-tools
 
 # fix gcc14
 if [ "$USE_GCC14" = y ] || [ "$USE_GCC15" = y ]; then
     # linux-atm
     rm -rf package/network/utils/linux-atm
-    git clone https://$github/sbwml/package_network_utils_linux-atm package/network/utils/linux-atm
+    git clone https://$github/xianren78/package_network_utils_linux-atm package/network/utils/linux-atm
     # glibc
     # Added the compiler flag -Wno-implicit-function-declaration to suppress
     # warnings about implicit function declarations during the build process.

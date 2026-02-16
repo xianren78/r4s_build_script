@@ -3,7 +3,7 @@
 #################################################################
 
 # autocore
-git clone https://$github/sbwml/autocore-arm -b openwrt-24.10 package/system/autocore
+git clone https://$github/xianren78/autocore-arm -b openwrt-24.10 package/system/autocore
 
 # rockchip - target - r4s/r5s only
 rm -rf target/linux/rockchip
@@ -43,17 +43,11 @@ grep HASH include/kernel-6.18 | awk -F'HASH-' '{print $2}' | awk '{print $1}' | 
 
 # kernel generic patches
 curl -s $mirror/openwrt/patch/kernel-6.18/openwrt/linux-6.18-target-linux-generic.patch | patch -p1
-local_kernel_version=$(sed -n 's/^LINUX_KERNEL_HASH-\([0-9.]\+\) = .*/\1/p' include/kernel-6.18)
-release_kernel_version=$(curl -sL https://raw.githubusercontent.com/sbwml/r4s_build_script/master/tags/kernel-6.18 | sed -n 's/^LINUX_KERNEL_HASH-\([0-9.]\+\) = .*/\1/p')
-if [ "$local_kernel_version" = "$release_kernel_version" ] && [ -z "$git_password" ] && [ "$(whoami)" != "sbwml" ]; then
-    git clone https://$github/sbwml/target_linux_generic -b openwrt-24.10 target/linux/generic-6.18 --depth=1
+if [ "$(whoami)" = "sbwml" ]; then
+    git clone https://$gitea/sbwml/target_linux_generic -b openwrt-24.10 target/linux/generic-6.18 --depth=1
 else
-    if [ "$(whoami)" = "sbwml" ]; then
-        git clone https://$gitea/sbwml/target_linux_generic -b openwrt-24.10 target/linux/generic-6.18 --depth=1
-    else
 #        git clone https://"$git_name":"$git_password"@$gitea/sbwml/target_linux_generic -b openwrt-24.10 target/linux/generic-6.18 --depth=1
-        git clone https://$git_targetnew@$github/xianren78/target_linux_generic -b openwrt-25.12 target/linux/generic-6.18 --depth=1
-    fi
+    git clone https://$git_targetnew@$github/xianren78/target_linux_generic -b openwrt-25.12 target/linux/generic-6.18 --depth=1
 fi
 cp -a target/linux/generic-6.18/* target/linux/generic
 
@@ -162,7 +156,7 @@ curl -s $mirror/openwrt/patch/iproute2/902-ss-display-ecn_low-if-tcp_info-tcpi_o
 
 # linux-firmware
 rm -rf package/firmware/linux-firmware
-git clone https://$github/sbwml/package_firmware_linux-firmware package/firmware/linux-firmware
+git clone https://$github/xianren78/package_firmware_linux-firmware package/firmware/linux-firmware
 
 # mt76
 rm -rf package/kernel/mt76
@@ -176,11 +170,11 @@ curl -s $mirror/openwrt/patch/openwrt-6.x/500-world-regd-5GHz.patch > package/fi
 
 # mac80211 - 6.18
 rm -rf package/kernel/mac80211
-git clone https://$github/sbwml/package_kernel_mac80211 package/kernel/mac80211 -b v6.18
+git clone https://$github/xianren78/package_kernel_mac80211 package/kernel/mac80211 -b v6.18
 
 # ath10k-ct
 rm -rf package/kernel/ath10k-ct
-git clone https://$github/sbwml/package_kernel_ath10k-ct package/kernel/ath10k-ct -b v6.18
+git clone https://$github/xianren78/package_kernel_ath10k-ct package/kernel/ath10k-ct -b v6.18
 
 # kernel patch
 # btf: silence btf module warning messages
@@ -196,7 +190,7 @@ curl -s $mirror/openwrt/patch/kernel-6.18/net/952-net-conntrack-events-support-m
 curl -s $mirror/openwrt/patch/kernel-6.18/net/953-net-patch-linux-kernel-to-support-shortcut-fe.patch > target/linux/generic/hack-6.18/953-net-patch-linux-kernel-to-support-shortcut-fe.patch
 
 # rtl8822cs
-git clone https://$github/sbwml/package_kernel_rtl8822cs package/kernel/rtl8822cs
+git clone https://$github/xianren78/package_kernel_rtl8822cs package/kernel/rtl8822cs
 
 # RTC
 if [ "$platform" = "rk3399" ] || [ "$platform" = "rk3568" ]; then
