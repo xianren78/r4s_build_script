@@ -64,15 +64,15 @@ jobs:
         sudo /usr/bin/caddy start --config caddyfile --adapter caddyfile
 
     - name: Free disk space
-      uses: sbwml/actions@free-disk
+      uses: xianren78/actions@free-disk
       with:
         build-mount-path: /builder
 
     - name: Build System Setup
-      uses: sbwml/actions@openwrt-build-setup
+      uses: xianren78/actions@openwrt-build-setup
 
     - name: Install LLVM
-      uses: sbwml/actions@install-llvm
+      uses: xianren78/actions@install-llvm
 
     - name: Restore Cached
       #if: ${{ matrix.model != 'armv8' }}
