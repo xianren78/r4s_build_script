@@ -72,6 +72,12 @@ jobs:
     - name: Install LLVM
       uses: xianren78/actions@install-llvm
 
+    - name: Restore Cached
+      uses: actions/cache/restore@v4
+      with:
+        path: /builder/.ccache
+        key: ${{ matrix.tag.version }}-${{ matrix.model }}-ccache
+
     - name: Compile OpenWrt
       id: compile
       continue-on-error: true
