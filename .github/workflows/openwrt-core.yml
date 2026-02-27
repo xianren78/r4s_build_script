@@ -97,6 +97,23 @@ jobs:
         cd openwrt
         make V=s IGNORE_ERRORS="n m"
 
+    - name: Delete Cached
+      #if: ${{ matrix.model != 'armv8' }}
+      continue-on-error: true
+      working-directory: /builder
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_REPO: ${{ github.repository }}
+      run: |
+        gh cache delete ${{ matrix.tag.version }}-${{ matrix.model }}-ccache || true
+
+    - name: Save Cached
+      #if: ${{ matrix.model != 'armv8' }}
+      uses: actions/cache/save@v4
+      with:
+        path: /builder/.ccache
+        key: ${{ matrix.tag.version }}-${{ matrix.model }}-ccache
+
     - name: Prepare files
       working-directory: /builder
       run: |
