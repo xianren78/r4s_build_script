@@ -20,9 +20,11 @@ rm -f target/linux/generic/pending-6.18/620-net_sched-codel-do-not-defer-queue-l
 rm -f target/linux/generic/pending-6.12/730-net-ethernet-mtk_eth_soc-reset-all-TX-queues-on-DMA-.patch
 rm -f target/linux/generic/pending-6.18/730-net-ethernet-mtk_eth_soc-reset-all-TX-queues-on-DMA-.patch
 
-# no 8261n in op 24.10
-rm -f target/linux/generic/hack-6.18/735-net-phy-realtek-rtl8261n.patch
-#rm -f target/linux/generic/hack-6.18/810-bcma-ssb-fallback-sprom.patch
+# 8261n in op 24.10
+#rm -f target/linux/generic/hack-6.18/735-net-phy-realtek-rtl8261n.patch
+rm -rf target/linux/mediatek/files-6.6/drivers/net/phy/rtl8261n
+git clone https://$github/xianren78/package_kernel_rtl8261n target/linux/generic/files/drivers/net/phy/rtl8261n
+
 
 #openssl 3.0.19
 rm -f package/libs/openssl/patches/140-allow-prefer-chacha20.patch
