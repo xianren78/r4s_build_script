@@ -121,46 +121,6 @@ jobs:
         cd openwrt
         make V=s IGNORE_ERRORS="n m"
 
-    - name: Delete Cached
-      #if: ${{ matrix.model != 'armv8' }}
-      continue-on-error: true
-      working-directory: /builder
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GH_REPO: ${{ github.repository }}
-      run: |
-        gh cache delete ${{ matrix.tag.version }}-${{ matrix.model }}-ccache || true
-
-    - name: Save Cached
-      #if: ${{ matrix.model != 'armv8' }}
-      uses: actions/cache/save@v4
-      with:
-        path: /builder/.ccache
-        key: ${{ matrix.tag.version }}-${{ matrix.model }}-ccache
-
-    - name: Create Ccache tar files
-      if: ${{ matrix.model == 'armv8-test' }}
-      continue-on-error: true
-      working-directory: /builder
-      run: |
-        mkdir -p ccache
-        tar cf - .ccache | split -d -b 1800m - ccache/${{ matrix.model }}.tar.
-
-    - name: Save Cached (releases)
-      if: ${{ matrix.model == 'armv8-test' }}
-      continue-on-error: true
-      uses: ncipollo/release-action@v1.14.0
-      with:
-        name: ccache
-        allowUpdates: true
-        tag: ccache
-        commit: master
-        replacesArtifacts: true
-        prerelease: true
-        token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: |
-          ${{ env.build_dir }}/ccache/*
-
     - name: Assemble Artifact
       working-directory: /builder
       run: |
