@@ -32,7 +32,7 @@ jobs:
         sudo timedatectl set-timezone 'Asia/Shanghai'
         git config --global user.name 'actions'
         git config --global user.email 'action@github.com'
-        sudo ln -s "$GITHUB_WORKSPACE" /builder
+        sudo mkdir -p /builder
         echo build_dir="/builder" >> "$GITHUB_ENV"
 
     - name: Show system
