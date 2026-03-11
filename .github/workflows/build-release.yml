@@ -62,7 +62,6 @@ jobs:
         sudo timedatectl set-timezone 'Asia/Shanghai'
         git config --global user.name 'actions'
         git config --global user.email 'action@github.com'
-        sudo mkdir -p /builder
         echo build_dir="/builder" >> "$GITHUB_ENV"
         [ "${{ github.event.inputs.version }}" = release ] && echo build_version="rc2" >> "$GITHUB_ENV" || echo build_version="dev" >> "$GITHUB_ENV"
 
@@ -98,6 +97,8 @@ jobs:
 
     - name: Install LLVM
       uses: xianren78/actions@install-llvm
+      with:
+        build-mount-path: /builder
 
     - name: Restore Cached
       if: ${{ github.event.inputs.ccache == 'true' && github.event.inputs.device != 'armv8' && github.event.inputs.device != 'nanopi-r4s' }}
