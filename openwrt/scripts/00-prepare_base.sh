@@ -13,6 +13,10 @@ fi
 # lto jobserver
 sed -i 's/-flto=auto/-flto=jobserver/g' include/package.mk
 
+# binutils from 25.12
+rm -rf toolchain/binutils
+git clone https://$github/xianren78/toolchain_binutils -b openwrt-25.12 toolchain/binutils
+
 # patch source
 curl -s $mirror/openwrt/patch/generic-24.10/0001-tools-add-upx-tools.patch | patch -p1
 curl -s $mirror/openwrt/patch/generic-24.10/0002-rootfs-add-upx-compression-support.patch | patch -p1
