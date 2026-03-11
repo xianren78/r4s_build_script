@@ -62,6 +62,7 @@ jobs:
         sudo timedatectl set-timezone 'Asia/Shanghai'
         git config --global user.name 'actions'
         git config --global user.email 'action@github.com'
+        sudo ln -s "$GITHUB_WORKSPACE" /builder
         echo build_dir="/builder" >> "$GITHUB_ENV"
         [ "${{ github.event.inputs.version }}" = release ] && echo build_version="rc2" >> "$GITHUB_ENV" || echo build_version="dev" >> "$GITHUB_ENV"
 
@@ -91,8 +92,6 @@ jobs:
 
     - name: Free disk space
       uses: xianren78/actions@free-disk
-      with:
-        build-mount-path: /builder
 
     - name: Build System Setup
       uses: xianren78/actions@openwrt-build-setup
