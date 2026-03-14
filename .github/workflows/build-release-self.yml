@@ -152,7 +152,7 @@ jobs:
  
     - name: Create release
       continue-on-error: true
-      uses: ncipollo/release-action@v1
+      uses: ncipollo/release-action@main
       with:
         name: ${{ env.latest_release }}
         allowUpdates: true
