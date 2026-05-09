@@ -78,8 +78,12 @@ pushd feeds/telephony
   git clone https://$github/xianren78/feeds_telephony_libs_dahdi-linux libs/dahdi-linux -b v6.18
 popd
 
-# routing - batman-adv fix build with linux-6.12
-curl -s $mirror/openwrt/patch/packages-patches/batman-adv/901-fix-linux-6.12rc2-builds.patch > feeds/routing/batman-adv/patches/901-fix-linux-6.12rc2-builds.patch
+# routing
+pushd feeds/routing
+  # batman-adv
+  rm -rf batman-adv
+  git clone https://$github/xianren78/feeds_routing_batman-adv batman-adv
+popd
 
 # clang
 if [ "$KERNEL_CLANG_LTO" = "y" ]; then

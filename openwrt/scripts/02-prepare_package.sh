@@ -20,7 +20,7 @@ git clone https://$github/timsaya/openwrt-bandix package/new/bandix --depth=1
 git clone https://$github/timsaya/luci-app-bandix package/new/luci-app-bandix --depth=1
 
 # luci-app-diskman
-git clone https://$github/sbwml/luci-app-diskman package/new/diskman --depth=1
+git clone https://$github/xianren78/luci-app-diskman package/new/diskman --depth=1
 
 # istore
 git clone https://$github/xianren78/package_new_istore package/new/istore --depth=1
