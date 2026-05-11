@@ -7,7 +7,7 @@ git clone https://$github/xianren78/packages_lang_golang -b 26.x feeds/packages/
 
 # node - prebuilt
 rm -rf feeds/packages/lang/node
-git clone https://$github/xianren78/feeds_packages_lang_node-prebuilt feeds/packages/lang/node -b packages-24.10
+git clone https://$github/xianren78/feeds_packages_lang_node feeds/packages/lang/node -b openwrt-25.12
 
 # default settings
 git clone https://$github/xianren78/default-settings package/new/default-settings -b openwrt-24.10
