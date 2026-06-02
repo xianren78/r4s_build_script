@@ -76,7 +76,7 @@ jobs:
 
     - name: Restore Cached
       #if: ${{ matrix.model != 'armv8' }}
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@main
       with:
         path: /builder/.ccache
         key: ${{ matrix.tag.version }}-${{ matrix.model }}-ccache
@@ -144,7 +144,7 @@ jobs:
         echo current_hour="$(date +'%H')" >> "$GITHUB_ENV"
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@main
       with:
         name: ${{ env.build_date }}-${{ matrix.model }}-${{ matrix.tag.version }}
         path: ${{ env.build_dir }}/rom/*.*

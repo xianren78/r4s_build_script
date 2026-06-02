@@ -73,7 +73,7 @@ jobs:
       uses: xianren78/actions@install-llvm
 
     - name: Restore Cached
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@main
       with:
         path: /builder/.ccache
         key: ${{ matrix.tag.version }}-${{ matrix.model }}-ccache
@@ -109,7 +109,7 @@ jobs:
 
     - name: Save Cached
       #if: ${{ matrix.model != 'armv8' }}
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@main
       with:
         path: /builder/.ccache
         key: ${{ matrix.tag.version }}-${{ matrix.model }}-ccache
