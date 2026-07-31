@@ -219,7 +219,7 @@ pushd package/libs/openssl/patches
     curl -sO $mirror/openwrt/patch/openssl/quic/0041-QUIC-Update-SSL_clear-to-clear-quic-data.patch
     curl -sO $mirror/openwrt/patch/openssl/quic/0042-QUIC-Better-SSL_clear.patch
     curl -sO $mirror/openwrt/patch/openssl/quic/0043-QUIC-Fix-extension-test.patch
-    curl -sO $mirror/openwrt/patch/openssl/quic/0044-QUIC-Update-metadata-version.patch
+#    curl -sO $mirror/openwrt/patch/openssl/quic/0044-QUIC-Update-metadata-version.patch
 popd
 
 # openssl benchmarks

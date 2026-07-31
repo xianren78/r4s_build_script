@@ -196,7 +196,7 @@ curl -s $mirror/openwrt/patch/openwrt-6.x/500-world-regd-5GHz.patch > package/fi
 
 # mac80211 - v7.x
 rm -rf package/kernel/mac80211
-git clone https://$github/xianren78/package_kernel_mac80211 package/kernel/mac80211 -b -b v7.0.13
+git clone https://$github/xianren78/package_kernel_mac80211 package/kernel/mac80211 -b v7.0.13
 
 # ath10k-ct
 rm -rf package/kernel/ath10k-ct
