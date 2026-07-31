@@ -1,4 +1,4 @@
-From 1838d91ae3f953de3c44d5076e0373dc7197993f Mon Sep 17 00:00:00 2001
+From 9877d645df7fb5de8b9ddc3cdc31a06cea469306 Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Fri, 12 Apr 2019 11:13:25 -0400
 Subject: [PATCH 01/43] QUIC: Add support for BoringSSL QUIC APIs
@@ -34,23 +34,25 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  ssl/ssl_local.h                      |  37 ++++
  ssl/ssl_quic.c                       | 248 +++++++++++++++++++++++++++
  ssl/statem/extensions.c              |  29 ++++
- ssl/statem/extensions_clnt.c         |  48 ++++++
+ ssl/statem/extensions_clnt.c         |  49 ++++++
  ssl/statem/extensions_srvr.c         |  51 ++++++
- ssl/statem/statem.c                  |  20 ++-
+ ssl/statem/statem.c                  |  16 +-
  ssl/statem/statem_lib.c              |  19 +-
  ssl/statem/statem_local.h            |  19 ++
  ssl/statem/statem_quic.c             | 106 ++++++++++++
  ssl/tls13_enc.c                      |  59 +++++++
  test/helpers/ssltestlib.c            |   5 +
- test/sslapitest.c                    | 131 ++++++++++++++
+ test/sslapitest.c                    | 132 ++++++++++++++
  test/tls13secretstest.c              |   7 +
  util/libssl.num                      |  11 ++
  util/other.syms                      |   2 +
- 30 files changed, 1185 insertions(+), 6 deletions(-)
+ 30 files changed, 1184 insertions(+), 4 deletions(-)
  create mode 100644 doc/man3/SSL_CTX_set_quic_method.pod
  create mode 100644 ssl/ssl_quic.c
  create mode 100644 ssl/statem/statem_quic.c
 
+diff --git a/Configure b/Configure
+index 5725abb5e8..1a59ebbf2d 100755
 --- a/Configure
 +++ b/Configure
 @@ -468,6 +468,7 @@ my @disablables = (
@@ -69,6 +71,8 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  
      "fips"              => [ "fips-securitychecks", "acvp-tests" ],
  
+diff --git a/INSTALL.md b/INSTALL.md
+index 5a90ff9475..25d33cb77f 100644
 --- a/INSTALL.md
 +++ b/INSTALL.md
 @@ -829,6 +829,10 @@ Don't use POSIX IO capabilities.
@@ -82,9 +86,11 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  ### no-rdrand
  
  Don't use hardware RDRAND capabilities.
+diff --git a/crypto/err/openssl.txt b/crypto/err/openssl.txt
+index dc4e3f310f..8381458a10 100644
 --- a/crypto/err/openssl.txt
 +++ b/crypto/err/openssl.txt
-@@ -1253,6 +1253,7 @@ SSL_R_AT_LEAST_TLS_1_2_NEEDED_IN_SUITEB_
+@@ -1254,6 +1254,7 @@ SSL_R_AT_LEAST_TLS_1_2_NEEDED_IN_SUITEB_MODE:158:\
  SSL_R_BAD_CHANGE_CIPHER_SPEC:103:bad change cipher spec
  SSL_R_BAD_CIPHER:186:bad cipher
  SSL_R_BAD_DATA:390:bad data
@@ -92,7 +98,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  SSL_R_BAD_DATA_RETURNED_BY_CALLBACK:106:bad data returned by callback
  SSL_R_BAD_DECOMPRESSION:107:bad decompression
  SSL_R_BAD_DH_VALUE:102:bad dh value
-@@ -1540,6 +1541,7 @@ SSL_R_VERSION_TOO_LOW:396:version too lo
+@@ -1541,6 +1542,7 @@ SSL_R_VERSION_TOO_LOW:396:version too low
  SSL_R_WRONG_CERTIFICATE_TYPE:383:wrong certificate type
  SSL_R_WRONG_CIPHER_RETURNED:261:wrong cipher returned
  SSL_R_WRONG_CURVE:378:wrong curve
@@ -100,6 +106,8 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  SSL_R_WRONG_SIGNATURE_LENGTH:264:wrong signature length
  SSL_R_WRONG_SIGNATURE_SIZE:265:wrong signature size
  SSL_R_WRONG_SIGNATURE_TYPE:370:wrong signature type
+diff --git a/doc/man3/SSL_CIPHER_get_name.pod b/doc/man3/SSL_CIPHER_get_name.pod
+index a10942433a..bb22c7b129 100644
 --- a/doc/man3/SSL_CIPHER_get_name.pod
 +++ b/doc/man3/SSL_CIPHER_get_name.pod
 @@ -13,6 +13,7 @@ SSL_CIPHER_get_digest_nid,
@@ -118,7 +126,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
   int SSL_CIPHER_is_aead(const SSL_CIPHER *c);
   const SSL_CIPHER *SSL_CIPHER_find(SSL *ssl, const unsigned char *ptr);
   uint32_t SSL_CIPHER_get_id(const SSL_CIPHER *c);
-@@ -91,6 +93,15 @@ TLS 1.3 cipher suites) B<NID_auth_any> i
+@@ -91,6 +93,15 @@ TLS 1.3 cipher suites) B<NID_auth_any> is returned. Examples (not comprehensive)
   NID_auth_ecdsa
   NID_auth_psk
  
@@ -143,6 +151,9 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  =head1 COPYRIGHT
  
  Copyright 2000-2025 The OpenSSL Project Authors. All Rights Reserved.
+diff --git a/doc/man3/SSL_CTX_set_quic_method.pod b/doc/man3/SSL_CTX_set_quic_method.pod
+new file mode 100644
+index 0000000000..d938eb4e30
 --- /dev/null
 +++ b/doc/man3/SSL_CTX_set_quic_method.pod
 @@ -0,0 +1,232 @@
@@ -378,9 +389,11 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
 +L<https://www.openssl.org/source/license.html>.
 +
 +=cut
+diff --git a/include/openssl/evp.h b/include/openssl/evp.h
+index b14ec2606e..6a5f73aabe 100644
 --- a/include/openssl/evp.h
 +++ b/include/openssl/evp.h
-@@ -1730,6 +1730,11 @@ int EVP_PKEY_CTX_set_mac_key(EVP_PKEY_CT
+@@ -1730,6 +1730,11 @@ int EVP_PKEY_CTX_set_mac_key(EVP_PKEY_CTX *ctx, const unsigned char *key,
   * Method handles all operations: don't assume any digest related defaults.
   */
  #define EVP_PKEY_FLAG_SIGCTX_CUSTOM 4
@@ -392,6 +405,8 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  #ifndef OPENSSL_NO_DEPRECATED_3_0
  OSSL_DEPRECATEDIN_3_0 const EVP_PKEY_METHOD *EVP_PKEY_meth_find(int type);
  OSSL_DEPRECATEDIN_3_0 EVP_PKEY_METHOD *EVP_PKEY_meth_new(int id, int flags);
+diff --git a/include/openssl/ssl.h.in b/include/openssl/ssl.h.in
+index 54f1496ab5..051c063c77 100644
 --- a/include/openssl/ssl.h.in
 +++ b/include/openssl/ssl.h.in
 @@ -2528,6 +2528,51 @@ void SSL_set_allow_early_data_cb(SSL *s,
@@ -446,6 +461,8 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  #ifdef __cplusplus
  }
  #endif
+diff --git a/include/openssl/sslerr.h b/include/openssl/sslerr.h
+index 5640ed72bf..69b151fab9 100644
 --- a/include/openssl/sslerr.h
 +++ b/include/openssl/sslerr.h
 @@ -26,6 +26,7 @@
@@ -464,6 +481,8 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  #define SSL_R_WRONG_SIGNATURE_LENGTH 264
  #define SSL_R_WRONG_SIGNATURE_SIZE 265
  #define SSL_R_WRONG_SIGNATURE_TYPE 370
+diff --git a/include/openssl/tls1.h b/include/openssl/tls1.h
+index bb949fbdea..256b386f7a 100644
 --- a/include/openssl/tls1.h
 +++ b/include/openssl/tls1.h
 @@ -150,6 +150,9 @@ extern "C" {
@@ -476,9 +495,11 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  #ifndef OPENSSL_NO_NEXTPROTONEG
  /* This is not an IANA defined extension number */
  #define TLSEXT_TYPE_next_proto_neg 13172
+diff --git a/include/openssl/types.h b/include/openssl/types.h
+index a3806b0265..1511de2888 100644
 --- a/include/openssl/types.h
 +++ b/include/openssl/types.h
-@@ -229,6 +229,8 @@ typedef struct ossl_decoder_ctx_st OSSL_
+@@ -231,6 +231,8 @@ typedef struct ossl_decoder_ctx_st OSSL_DECODER_CTX;
  
  typedef struct ossl_self_test_st OSSL_SELF_TEST;
  
@@ -487,6 +508,8 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  #ifdef __cplusplus
  }
  #endif
+diff --git a/ssl/build.info b/ssl/build.info
+index 0851357f81..ac87437906 100644
 --- a/ssl/build.info
 +++ b/ssl/build.info
 @@ -38,6 +38,8 @@ IF[{- !$disabled{'deprecated-3.0'} -}]
@@ -498,6 +521,8 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  DEFINE[../libssl]=$AESDEF
  
  SOURCE[../providers/libcommon.a]=record/tls_pad.c
+diff --git a/ssl/s3_msg.c b/ssl/s3_msg.c
+index f2f2c595e3..38262bf85a 100644
 --- a/ssl/s3_msg.c
 +++ b/ssl/s3_msg.c
 @@ -81,6 +81,16 @@ int ssl3_dispatch_alert(SSL *s)
@@ -517,9 +542,11 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
      i = do_ssl3_write(s, SSL3_RT_ALERT, &s->s3.send_alert[0], &alertlen, 1, 0,
          &written);
      if (i <= 0) {
+diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
+index c9a3d9b55a..d11aaef9a7 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
-@@ -2226,3 +2226,35 @@ const char *OSSL_default_ciphersuites(vo
+@@ -2230,3 +2230,35 @@ const char *OSSL_default_ciphersuites(void)
             "TLS_CHACHA20_POLY1305_SHA256:"
             "TLS_AES_128_GCM_SHA256";
  }
@@ -555,9 +582,11 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
 +    }
 +    return NID_undef;
 +}
+diff --git a/ssl/ssl_err.c b/ssl/ssl_err.c
+index bea7973d94..e756e5cf2e 100644
 --- a/ssl/ssl_err.c
 +++ b/ssl/ssl_err.c
-@@ -27,6 +27,7 @@ static const ERR_STRING_DATA SSL_str_rea
+@@ -27,6 +27,7 @@ static const ERR_STRING_DATA SSL_str_reasons[] = {
          "bad change cipher spec" },
      { ERR_PACK(ERR_LIB_SSL, 0, SSL_R_BAD_CIPHER), "bad cipher" },
      { ERR_PACK(ERR_LIB_SSL, 0, SSL_R_BAD_DATA), "bad data" },
@@ -565,7 +594,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
      { ERR_PACK(ERR_LIB_SSL, 0, SSL_R_BAD_DATA_RETURNED_BY_CALLBACK),
          "bad data returned by callback" },
      { ERR_PACK(ERR_LIB_SSL, 0, SSL_R_BAD_DECOMPRESSION), "bad decompression" },
-@@ -548,6 +549,8 @@ static const ERR_STRING_DATA SSL_str_rea
+@@ -548,6 +549,8 @@ static const ERR_STRING_DATA SSL_str_reasons[] = {
      { ERR_PACK(ERR_LIB_SSL, 0, SSL_R_WRONG_CIPHER_RETURNED),
          "wrong cipher returned" },
      { ERR_PACK(ERR_LIB_SSL, 0, SSL_R_WRONG_CURVE), "wrong curve" },
@@ -574,6 +603,8 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
      { ERR_PACK(ERR_LIB_SSL, 0, SSL_R_WRONG_SIGNATURE_LENGTH),
          "wrong signature length" },
      { ERR_PACK(ERR_LIB_SSL, 0, SSL_R_WRONG_SIGNATURE_SIZE),
+diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
+index 0cfe869acc..cea6e3fcb7 100644
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
 @@ -844,6 +844,10 @@ SSL *SSL_new(SSL_CTX *ctx)
@@ -619,7 +650,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
      if (s->handshake_func == NULL) {
          ERR_raise(ERR_LIB_SSL, SSL_R_UNINITIALIZED);
          return -1;
-@@ -1950,6 +1972,12 @@ int SSL_get_early_data_status(const SSL
+@@ -1950,6 +1972,12 @@ int SSL_get_early_data_status(const SSL *s)
  
  static int ssl_peek_internal(SSL *s, void *buf, size_t num, size_t *readbytes)
  {
@@ -632,7 +663,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
      if (s->handshake_func == NULL) {
          ERR_raise(ERR_LIB_SSL, SSL_R_UNINITIALIZED);
          return -1;
-@@ -2009,6 +2037,12 @@ int SSL_peek_ex(SSL *s, void *buf, size_
+@@ -2009,6 +2037,12 @@ int SSL_peek_ex(SSL *s, void *buf, size_t num, size_t *readbytes)
  
  int ssl_write_internal(SSL *s, const void *buf, size_t num, size_t *written)
  {
@@ -657,7 +688,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
          bio = SSL_get_rbio(s);
          if (BIO_should_read(bio))
              return SSL_ERROR_WANT_READ;
-@@ -4201,7 +4240,7 @@ EVP_PKEY *SSL_CTX_get0_privatekey(const
+@@ -4201,7 +4240,7 @@ EVP_PKEY *SSL_CTX_get0_privatekey(const SSL_CTX *ctx)
  
  const SSL_CIPHER *SSL_get_current_cipher(const SSL *s)
  {
@@ -666,6 +697,8 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
          return s->session->cipher;
      return NULL;
  }
+diff --git a/ssl/ssl_local.h b/ssl/ssl_local.h
+index 2b6f4c1ad4..50fa593412 100644
 --- a/ssl/ssl_local.h
 +++ b/ssl/ssl_local.h
 @@ -352,6 +352,13 @@
@@ -739,6 +772,9 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
      /*
       * Parsed form of the ClientHello, kept around across client_hello_cb
       * calls.
+diff --git a/ssl/ssl_quic.c b/ssl/ssl_quic.c
+new file mode 100644
+index 0000000000..a39e4419c9
 --- /dev/null
 +++ b/ssl/ssl_quic.c
 @@ -0,0 +1,248 @@
@@ -990,9 +1026,11 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
 +}
 +
 +#endif
+diff --git a/ssl/statem/extensions.c b/ssl/statem/extensions.c
+index ad597cb8ed..da307edc93 100644
 --- a/ssl/statem/extensions.c
 +++ b/ssl/statem/extensions.c
-@@ -59,6 +59,10 @@ static int final_early_data(SSL *s, unsi
+@@ -59,6 +59,10 @@ static int final_early_data(SSL *s, unsigned int context, int sent);
  static int final_maxfragmentlen(SSL *s, unsigned int context, int sent);
  static int init_post_handshake_auth(SSL *s, unsigned int context);
  static int final_psk(SSL *s, unsigned int context, int sent);
@@ -1003,7 +1041,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  
  /* Structure to define a built-in extension */
  typedef struct extensions_definition_st {
-@@ -330,6 +334,19 @@ static const EXTENSION_DEFINITION ext_de
+@@ -330,6 +334,19 @@ static const EXTENSION_DEFINITION ext_defs[] = {
          tls_construct_certificate_authorities,
          NULL,
      },
@@ -1023,7 +1061,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
      { /* Must be immediately before pre_shared_key */
          TLSEXT_TYPE_padding,
          SSL_EXT_CLIENT_HELLO,
-@@ -1670,3 +1687,15 @@ static int final_psk(SSL *s, unsigned in
+@@ -1670,3 +1687,15 @@ static int final_psk(SSL *s, unsigned int context, int sent)
  
      return 1;
  }
@@ -1039,9 +1077,11 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
 +    return 1;
 +}
 +#endif
+diff --git a/ssl/statem/extensions_clnt.c b/ssl/statem/extensions_clnt.c
+index 859d6bd647..058f8a47c4 100644
 --- a/ssl/statem/extensions_clnt.c
 +++ b/ssl/statem/extensions_clnt.c
-@@ -1195,6 +1195,29 @@ EXT_RETURN tls_construct_ctos_post_hands
+@@ -1195,6 +1195,29 @@ EXT_RETURN tls_construct_ctos_post_handshake_auth(SSL *s, WPACKET *pkt,
  #endif
  }
  
@@ -1071,7 +1111,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  /*
   * Parse the server's renegotiation binding and abort if it's not right
   */
-@@ -2003,3 +2026,29 @@ int tls_parse_stoc_psk(SSL *s, PACKET *p
+@@ -2003,3 +2026,29 @@ int tls_parse_stoc_psk(SSL *s, PACKET *pkt, unsigned int context, X509 *x,
  
      return 1;
  }
@@ -1101,9 +1141,11 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
 +    return 1;
 +}
 +#endif
+diff --git a/ssl/statem/extensions_srvr.c b/ssl/statem/extensions_srvr.c
+index 571d716e86..af61239c9b 100644
 --- a/ssl/statem/extensions_srvr.c
 +++ b/ssl/statem/extensions_srvr.c
-@@ -1249,6 +1249,33 @@ int tls_parse_ctos_post_handshake_auth(S
+@@ -1258,6 +1258,33 @@ int tls_parse_ctos_post_handshake_auth(SSL *s, PACKET *pkt,
      return 1;
  }
  
@@ -1137,7 +1179,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  /*
   * Add the server's renegotiation binding
   */
-@@ -1934,3 +1961,27 @@ EXT_RETURN tls_construct_stoc_psk(SSL *s
+@@ -1943,3 +1970,27 @@ EXT_RETURN tls_construct_stoc_psk(SSL *s, WPACKET *pkt, unsigned int context,
  
      return EXT_RETURN_SENT;
  }
@@ -1165,9 +1207,11 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
 +    return EXT_RETURN_SENT;
 +}
 +#endif
+diff --git a/ssl/statem/statem.c b/ssl/statem/statem.c
+index 836bf9c50e..f7130db25f 100644
 --- a/ssl/statem/statem.c
 +++ b/ssl/statem/statem.c
-@@ -582,6 +582,10 @@ static SUB_STATE_RETURN read_state_machi
+@@ -566,6 +566,10 @@ static SUB_STATE_RETURN read_state_machine(SSL *s)
                   * In DTLS we get the whole message in one go - header and body
                   */
                  ret = dtls_get_message(s, &mt);
@@ -1178,18 +1222,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
              } else {
                  ret = tls_get_message_header(s, &mt);
              }
-@@ -611,8 +615,8 @@ static SUB_STATE_RETURN read_state_machi
-                 return SUB_STATE_ERROR;
-             }
- 
--            /* dtls_get_message already did this */
--            if (!SSL_IS_DTLS(s)
-+            /* dtls_get_message/quic_get_message already did this */
-+            if (!SSL_IS_DTLS(s) && !SSL_IS_QUIC(s)
-                 && s->s3.tmp.message_size > 0
-                 && !grow_init_buf(s, s->s3.tmp.message_size + SSL3_HM_HEADER_LENGTH)) {
-                 SSLfatal(s, SSL_AD_INTERNAL_ERROR, ERR_R_BUF_LIB);
-@@ -629,7 +633,8 @@ static SUB_STATE_RETURN read_state_machi
+@@ -605,7 +609,8 @@ static SUB_STATE_RETURN read_state_machine(SSL *s)
                   * opportunity to do any further processing.
                   */
                  ret = dtls_get_message_body(s, &len);
@@ -1199,7 +1232,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
                  ret = tls_get_message_body(s, &len);
              }
              if (ret == 0) {
-@@ -919,6 +924,15 @@ static SUB_STATE_RETURN write_state_mach
+@@ -895,6 +900,15 @@ static SUB_STATE_RETURN write_state_machine(SSL *s)
  int statem_flush(SSL *s)
  {
      s->rwstate = SSL_WRITING;
@@ -1215,6 +1248,8 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
      if (BIO_flush(s->wbio) <= 0) {
          return 0;
      }
+diff --git a/ssl/statem/statem_lib.c b/ssl/statem/statem_lib.c
+index 3c730796c0..2290be2bd1 100644
 --- a/ssl/statem/statem_lib.c
 +++ b/ssl/statem/statem_lib.c
 @@ -44,9 +44,23 @@ int ssl3_do_write(SSL *s, int type)
@@ -1243,7 +1278,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
      if (ret <= 0)
          return -1;
      if (type == SSL3_RT_HANDSHAKE)
-@@ -1173,6 +1187,7 @@ int tls_get_message_header(SSL *s, int *
+@@ -1173,6 +1187,7 @@ int tls_get_message_header(SSL *s, int *mt)
  
      do {
          while (s->init_num < SSL3_HM_HEADER_LENGTH) {
@@ -1251,9 +1286,11 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
              i = s->method->ssl_read_bytes(s, SSL3_RT_HANDSHAKE, &recvd_type,
                  &p[s->init_num],
                  SSL3_HM_HEADER_LENGTH - s->init_num,
+diff --git a/ssl/statem/statem_local.h b/ssl/statem/statem_local.h
+index 60f9c92e53..a5b74c20c1 100644
 --- a/ssl/statem/statem_local.h
 +++ b/ssl/statem/statem_local.h
-@@ -104,6 +104,7 @@ __owur int tls_get_message_header(SSL *s
+@@ -104,6 +104,7 @@ __owur int tls_get_message_header(SSL *s, int *mt);
  __owur int tls_get_message_body(SSL *s, size_t *len);
  __owur int dtls_get_message(SSL *s, int *mt);
  __owur int dtls_get_message_body(SSL *s, size_t *len);
@@ -1261,7 +1298,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  
  /* Message construction and processing functions */
  __owur int tls_process_initial_server_flight(SSL *s);
-@@ -251,6 +252,10 @@ int tls_parse_ctos_psk(SSL *s, PACKET *p
+@@ -251,6 +252,10 @@ int tls_parse_ctos_psk(SSL *s, PACKET *pkt, unsigned int context, X509 *x,
      size_t chainidx);
  int tls_parse_ctos_post_handshake_auth(SSL *, PACKET *pkt, unsigned int context,
      X509 *x, size_t chainidx);
@@ -1272,7 +1309,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  
  EXT_RETURN tls_construct_stoc_renegotiate(SSL *s, WPACKET *pkt,
      unsigned int context, X509 *x,
-@@ -311,6 +316,11 @@ EXT_RETURN tls_construct_stoc_cryptopro_
+@@ -311,6 +316,11 @@ EXT_RETURN tls_construct_stoc_cryptopro_bug(SSL *s, WPACKET *pkt,
      size_t chainidx);
  EXT_RETURN tls_construct_stoc_psk(SSL *s, WPACKET *pkt, unsigned int context,
      X509 *x, size_t chainidx);
@@ -1284,7 +1321,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  
  /* Client Extension processing */
  EXT_RETURN tls_construct_ctos_renegotiate(SSL *s, WPACKET *pkt, unsigned int context,
-@@ -380,6 +390,11 @@ EXT_RETURN tls_construct_ctos_psk(SSL *s
+@@ -380,6 +390,11 @@ EXT_RETURN tls_construct_ctos_psk(SSL *s, WPACKET *pkt, unsigned int context,
      X509 *x, size_t chainidx);
  EXT_RETURN tls_construct_ctos_post_handshake_auth(SSL *s, WPACKET *pkt, unsigned int context,
      X509 *x, size_t chainidx);
@@ -1296,7 +1333,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  
  int tls_parse_stoc_renegotiate(SSL *s, PACKET *pkt, unsigned int context,
      X509 *x, size_t chainidx);
-@@ -423,6 +438,10 @@ int tls_parse_stoc_cookie(SSL *s, PACKET
+@@ -423,6 +438,10 @@ int tls_parse_stoc_cookie(SSL *s, PACKET *pkt, unsigned int context, X509 *x,
      size_t chainidx);
  int tls_parse_stoc_psk(SSL *s, PACKET *pkt, unsigned int context, X509 *x,
      size_t chainidx);
@@ -1307,6 +1344,9 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  
  int tls_handle_alpn(SSL *s);
  
+diff --git a/ssl/statem/statem_quic.c b/ssl/statem/statem_quic.c
+new file mode 100644
+index 0000000000..66acc30d6d
 --- /dev/null
 +++ b/ssl/statem/statem_quic.c
 @@ -0,0 +1,106 @@
@@ -1416,9 +1456,11 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
 +}
 +
 +#endif
+diff --git a/ssl/tls13_enc.c b/ssl/tls13_enc.c
+index 396bf28f7d..bc7ef4a79a 100644
 --- a/ssl/tls13_enc.c
 +++ b/ssl/tls13_enc.c
-@@ -439,6 +439,9 @@ int tls13_change_cipher_state(SSL *s, in
+@@ -439,6 +439,9 @@ int tls13_change_cipher_state(SSL *s, int which)
      ktls_crypto_info_t crypto_info;
      BIO *bio;
  #endif
@@ -1428,7 +1470,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  
      if (which & SSL3_CC_READ) {
          if (s->enc_read_ctx != NULL) {
-@@ -484,6 +487,9 @@ int tls13_change_cipher_state(SSL *s, in
+@@ -484,6 +487,9 @@ int tls13_change_cipher_state(SSL *s, int which)
              label = client_early_traffic;
              labellen = sizeof(client_early_traffic) - 1;
              log_label = CLIENT_EARLY_LABEL;
@@ -1438,7 +1480,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  
              handlen = BIO_get_mem_data(s->s3.handshake_buffer, &hdata);
              if (handlen <= 0) {
-@@ -542,6 +548,9 @@ int tls13_change_cipher_state(SSL *s, in
+@@ -542,6 +548,9 @@ int tls13_change_cipher_state(SSL *s, int which)
                  goto err;
              }
              hashlen = hashlenui;
@@ -1448,7 +1490,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
              EVP_MD_CTX_free(mdctx);
  
              if (!tls13_hkdf_expand(s, md, insecret,
-@@ -559,6 +568,14 @@ int tls13_change_cipher_state(SSL *s, in
+@@ -559,6 +568,14 @@ int tls13_change_cipher_state(SSL *s, int which)
                  /* SSLfatal() already called */
                  goto err;
              }
@@ -1463,7 +1505,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
          } else if (which & SSL3_CC_HANDSHAKE) {
              insecret = s->handshake_secret;
              finsecret = s->client_finished_secret;
-@@ -566,6 +583,15 @@ int tls13_change_cipher_state(SSL *s, in
+@@ -566,6 +583,15 @@ int tls13_change_cipher_state(SSL *s, int which)
              label = client_handshake_traffic;
              labellen = sizeof(client_handshake_traffic) - 1;
              log_label = CLIENT_HANDSHAKE_LABEL;
@@ -1479,7 +1521,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
              /*
               * The handshake hash used for the server read/client write handshake
               * traffic secret is the same as the hash for the server
-@@ -588,6 +614,15 @@ int tls13_change_cipher_state(SSL *s, in
+@@ -588,6 +614,15 @@ int tls13_change_cipher_state(SSL *s, int which)
               * previously saved value.
               */
              hash = s->server_finished_hash;
@@ -1495,7 +1537,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
          }
      } else {
          /* Early data never applies to client-read/server-write */
-@@ -598,11 +633,29 @@ int tls13_change_cipher_state(SSL *s, in
+@@ -598,11 +633,29 @@ int tls13_change_cipher_state(SSL *s, int which)
              label = server_handshake_traffic;
              labellen = sizeof(server_handshake_traffic) - 1;
              log_label = SERVER_HANDSHAKE_LABEL;
@@ -1525,7 +1567,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
          }
      }
  
-@@ -730,6 +783,12 @@ int tls13_change_cipher_state(SSL *s, in
+@@ -730,6 +783,12 @@ int tls13_change_cipher_state(SSL *s, int which)
  skip_ktls:
  #endif
  #endif
@@ -1538,9 +1580,11 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
      ret = 1;
  err:
      if ((which & SSL3_CC_EARLY) != 0) {
+diff --git a/test/helpers/ssltestlib.c b/test/helpers/ssltestlib.c
+index b5350597c0..474ebfbd23 100644
 --- a/test/helpers/ssltestlib.c
 +++ b/test/helpers/ssltestlib.c
-@@ -1166,6 +1166,11 @@ int create_ssl_connection(SSL *serverssl
+@@ -1166,6 +1166,11 @@ int create_ssl_connection(SSL *serverssl, SSL *clientssl, int want)
      if (!create_bare_ssl_connection(serverssl, clientssl, want, 1))
          return 0;
  
@@ -1552,9 +1596,11 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
      /*
       * We attempt to read some data on the client side which we expect to fail.
       * This will ensure we have received the NewSessionTicket in TLSv1.3 where
+diff --git a/test/sslapitest.c b/test/sslapitest.c
+index 6d9d4eeb8f..737cae240c 100644
 --- a/test/sslapitest.c
 +++ b/test/sslapitest.c
-@@ -10864,6 +10864,135 @@ end:
+@@ -10964,6 +10964,135 @@ end:
      return testresult;
  }
  
@@ -1690,7 +1736,7 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  static struct next_proto_st {
      int serverlen;
      unsigned char server[40];
-@@ -11524,6 +11653,9 @@ int setup_tests(void)
+@@ -11625,6 +11754,9 @@ int setup_tests(void)
  #endif
      ADD_ALL_TESTS(test_alpn, 4);
      ADD_ALL_TESTS(test_no_renegotiation, 2);
@@ -1700,6 +1746,8 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
      return 1;
  
  err:
+diff --git a/test/tls13secretstest.c b/test/tls13secretstest.c
+index 4da379d5c4..6f67547ca2 100644
 --- a/test/tls13secretstest.c
 +++ b/test/tls13secretstest.c
 @@ -224,6 +224,13 @@ void ssl_evp_md_free(const EVP_MD *md)
@@ -1716,9 +1764,11 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  /* End of mocked out code */
  
  static int test_secret(SSL *s, unsigned char *prk,
+diff --git a/util/libssl.num b/util/libssl.num
+index f055c967bf..72ee0bedc6 100644
 --- a/util/libssl.num
 +++ b/util/libssl.num
-@@ -520,3 +520,14 @@ SSL_load_client_CA_file_ex
+@@ -520,3 +520,14 @@ SSL_load_client_CA_file_ex              520	3_0_0	EXIST::FUNCTION:
  SSL_set0_tmp_dh_pkey                    521	3_0_0	EXIST::FUNCTION:
  SSL_CTX_set0_tmp_dh_pkey                522	3_0_0	EXIST::FUNCTION:
  SSL_group_to_name                       523	3_0_0	EXIST::FUNCTION:
@@ -1733,9 +1783,11 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
 +SSL_quic_max_handshake_flight_len       20008	3_0_0	EXIST::FUNCTION:QUIC
 +SSL_process_quic_post_handshake         20009	3_0_0	EXIST::FUNCTION:QUIC
 +SSL_provide_quic_data                   20010	3_0_0	EXIST::FUNCTION:QUIC
+diff --git a/util/other.syms b/util/other.syms
+index ad38a7c530..7386a3a893 100644
 --- a/util/other.syms
 +++ b/util/other.syms
-@@ -143,6 +143,8 @@ custom_ext_free_cb
+@@ -143,6 +143,8 @@ custom_ext_free_cb                      datatype
  custom_ext_parse_cb                     datatype
  pem_password_cb                         datatype
  ssl_ct_validation_cb                    datatype
@@ -1744,3 +1796,6 @@ Based on BoringSSL commit b1b76aee3cb43ce11889403c5334283d951ebd37
  #
  ASN1_BIT_STRING_digest                  define
  BIO_append_filename                     define
+-- 
+2.47.3
+

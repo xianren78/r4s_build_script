@@ -1,4 +1,4 @@
-From 70a17b75867850760ebf90b899e53f31b3b7c256 Mon Sep 17 00:00:00 2001
+From 513bd94bb95791f8f56c51c046533e78d3735a68 Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Wed, 13 Nov 2019 12:11:00 -0500
 Subject: [PATCH 18/43] QUIC: Handle EndOfEarlyData and MaxEarlyData
@@ -10,9 +10,11 @@ Subject: [PATCH 18/43] QUIC: Handle EndOfEarlyData and MaxEarlyData
  ssl/statem/statem_srvr.c     |  4 ++++
  4 files changed, 33 insertions(+), 2 deletions(-)
 
+diff --git a/ssl/statem/extensions_clnt.c b/ssl/statem/extensions_clnt.c
+index a544e05cad..920af9b49b 100644
 --- a/ssl/statem/extensions_clnt.c
 +++ b/ssl/statem/extensions_clnt.c
-@@ -1942,6 +1942,17 @@ int tls_parse_stoc_early_data(SSL *s, PA
+@@ -1942,6 +1942,17 @@ int tls_parse_stoc_early_data(SSL *s, PACKET *pkt, unsigned int context,
              return 0;
          }
  
@@ -30,9 +32,11 @@ Subject: [PATCH 18/43] QUIC: Handle EndOfEarlyData and MaxEarlyData
          s->session->ext.max_early_data = max_early_data;
  
          return 1;
+diff --git a/ssl/statem/extensions_srvr.c b/ssl/statem/extensions_srvr.c
+index b07ada91ec..08cc2c76de 100644
 --- a/ssl/statem/extensions_srvr.c
 +++ b/ssl/statem/extensions_srvr.c
-@@ -1910,12 +1910,20 @@ EXT_RETURN tls_construct_stoc_early_data
+@@ -1919,12 +1919,20 @@ EXT_RETURN tls_construct_stoc_early_data(SSL *s, WPACKET *pkt,
      size_t chainidx)
  {
      if (context == SSL_EXT_TLS1_3_NEW_SESSION_TICKET) {
@@ -55,9 +59,11 @@ Subject: [PATCH 18/43] QUIC: Handle EndOfEarlyData and MaxEarlyData
              || !WPACKET_close(pkt)) {
              SSLfatal(s, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);
              return EXT_RETURN_FAIL;
+diff --git a/ssl/statem/statem_clnt.c b/ssl/statem/statem_clnt.c
+index 4b5f966e5e..451e39c1ed 100644
 --- a/ssl/statem/statem_clnt.c
 +++ b/ssl/statem/statem_clnt.c
-@@ -902,6 +902,14 @@ int ossl_statem_client_construct_message
+@@ -902,6 +902,14 @@ int ossl_statem_client_construct_message(SSL *s, WPACKET *pkt,
          break;
  
      case TLS_ST_CW_END_OF_EARLY_DATA:
@@ -72,9 +78,11 @@ Subject: [PATCH 18/43] QUIC: Handle EndOfEarlyData and MaxEarlyData
          *confunc = tls_construct_end_of_early_data;
          *mt = SSL3_MT_END_OF_EARLY_DATA;
          break;
+diff --git a/ssl/statem/statem_srvr.c b/ssl/statem/statem_srvr.c
+index 86eb69562b..db374022a9 100644
 --- a/ssl/statem/statem_srvr.c
 +++ b/ssl/statem/statem_srvr.c
-@@ -76,6 +76,10 @@ static int ossl_statem_server13_read_tra
+@@ -76,6 +76,10 @@ static int ossl_statem_server13_read_transition(SSL *s, int mt)
              break;
          } else if (s->ext.early_data == SSL_EARLY_DATA_ACCEPTED) {
              if (mt == SSL3_MT_END_OF_EARLY_DATA) {
@@ -85,3 +93,6 @@ Subject: [PATCH 18/43] QUIC: Handle EndOfEarlyData and MaxEarlyData
                  st->hand_state = TLS_ST_SR_END_OF_EARLY_DATA;
                  return 1;
              }
+-- 
+2.47.3
+

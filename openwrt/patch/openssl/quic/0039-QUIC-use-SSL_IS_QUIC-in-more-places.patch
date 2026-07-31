@@ -1,4 +1,4 @@
-From b240c965d1c7c1d2095c2af798c4853d3379480a Mon Sep 17 00:00:00 2001
+From 6ad75bf95fa2631e3c834d943b36d95e18c70cda Mon Sep 17 00:00:00 2001
 From: Benjamin Kaduk <bkaduk@akamai.com>
 Date: Tue, 7 Sep 2021 14:21:22 -0700
 Subject: [PATCH 39/43] QUIC: use SSL_IS_QUIC() in more places
@@ -9,6 +9,8 @@ Subject: [PATCH 39/43] QUIC: use SSL_IS_QUIC() in more places
  ssl/statem/statem_clnt.c             | 2 +-
  3 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/doc/man3/SSL_CTX_set_quic_method.pod b/doc/man3/SSL_CTX_set_quic_method.pod
+index 06599023d7..78003455a6 100644
 --- a/doc/man3/SSL_CTX_set_quic_method.pod
 +++ b/doc/man3/SSL_CTX_set_quic_method.pod
 @@ -105,7 +105,7 @@ the client will send both extensions.
@@ -20,9 +22,11 @@ Subject: [PATCH 39/43] QUIC: use SSL_IS_QUIC() in more places
  negotiated.
  
  SSL_set_quic_early_data_enabled() enables QUIC early data if a nonzero
+diff --git a/ssl/statem/extensions_clnt.c b/ssl/statem/extensions_clnt.c
+index 889eff70f7..0bc863e604 100644
 --- a/ssl/statem/extensions_clnt.c
 +++ b/ssl/statem/extensions_clnt.c
-@@ -1967,7 +1967,7 @@ int tls_parse_stoc_early_data(SSL *s, PA
+@@ -1967,7 +1967,7 @@ int tls_parse_stoc_early_data(SSL *s, PACKET *pkt, unsigned int context,
           * QUIC server must send 0xFFFFFFFF or it's a PROTOCOL_VIOLATION
           * per RFC9001 S4.6.1
           */
@@ -31,9 +35,11 @@ Subject: [PATCH 39/43] QUIC: use SSL_IS_QUIC() in more places
              SSLfatal(s, SSL_AD_ILLEGAL_PARAMETER, SSL_R_INVALID_MAX_EARLY_DATA);
              return 0;
          }
+diff --git a/ssl/statem/statem_clnt.c b/ssl/statem/statem_clnt.c
+index e140d7d249..94ae1c1ba8 100644
 --- a/ssl/statem/statem_clnt.c
 +++ b/ssl/statem/statem_clnt.c
-@@ -904,7 +904,7 @@ int ossl_statem_client_construct_message
+@@ -904,7 +904,7 @@ int ossl_statem_client_construct_message(SSL *s, WPACKET *pkt,
      case TLS_ST_CW_END_OF_EARLY_DATA:
  #ifndef OPENSSL_NO_QUIC
          /* QUIC does not send EndOfEarlyData, RFC9001 S8.3 */
@@ -42,3 +48,6 @@ Subject: [PATCH 39/43] QUIC: use SSL_IS_QUIC() in more places
              *confunc = NULL;
              *mt = SSL3_MT_DUMMY;
              break;
+-- 
+2.47.3
+

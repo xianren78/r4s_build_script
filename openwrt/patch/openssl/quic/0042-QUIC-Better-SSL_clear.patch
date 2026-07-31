@@ -1,4 +1,4 @@
-From 87ce5b9478fbed0576abe1809a3eece9a5f28680 Mon Sep 17 00:00:00 2001
+From 7460614767f582820df790009e8f9a9be1e96e7b Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Fri, 29 Oct 2021 14:15:06 -0400
 Subject: [PATCH 42/43] QUIC: Better SSL_clear()
@@ -15,15 +15,17 @@ Don't make the new functions public.
  test/sslapitest.c   | 17 +++-------
  4 files changed, 63 insertions(+), 45 deletions(-)
 
+diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
+index 3b5ab33bd7..3d13cfe00c 100644
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
-@@ -572,8 +572,57 @@ static void clear_ciphers(SSL *s)
+@@ -572,7 +572,56 @@ static void clear_ciphers(SSL *s)
      ssl_clear_hash_ctx(&s->write_hash);
  }
  
 +#ifndef OPENSSL_NO_QUIC
  int SSL_clear(SSL *s)
- {
++{
 +    if (!SSL_clear_not_quic(s))
 +        return 0;
 +    return SSL_clear_quic(s);
@@ -71,10 +73,9 @@ Don't make the new functions public.
 +#else
 +int SSL_clear(SSL *s)
 +#endif
-+{
+ {
      if (s->method == NULL) {
          ERR_raise(ERR_LIB_SSL, SSL_R_NO_METHOD_SPECIFIED);
-         return 0;
 @@ -631,38 +680,6 @@ int SSL_clear(SSL *s)
      s->shared_sigalgs = NULL;
      s->shared_sigalgslen = 0;
@@ -114,9 +115,11 @@ Don't make the new functions public.
      /*
       * Check to see if we were changed into a different method, if so, revert
       * back.
+diff --git a/ssl/ssl_local.h b/ssl/ssl_local.h
+index 4f3471ac26..5fdcacd196 100644
 --- a/ssl/ssl_local.h
 +++ b/ssl/ssl_local.h
-@@ -2879,6 +2879,11 @@ void custom_exts_free(custom_ext_methods
+@@ -2879,6 +2879,11 @@ void custom_exts_free(custom_ext_methods *exts);
  
  void ssl_comp_free_compression_methods_int(void);
  
@@ -128,9 +131,11 @@ Don't make the new functions public.
  /* ssl_mcnf.c */
  void ssl_ctx_system_config(SSL_CTX *ctx);
  
+diff --git a/ssl/statem/statem.c b/ssl/statem/statem.c
+index c3ab696834..eb4a4736fb 100644
 --- a/ssl/statem/statem.c
 +++ b/ssl/statem/statem.c
-@@ -333,8 +333,13 @@ static int state_machine(SSL *s, int ser
+@@ -333,8 +333,13 @@ static int state_machine(SSL *s, int server)
           * If we are stateless then we already called SSL_clear() - don't do
           * it again and clear the STATELESS flag itself.
           */
@@ -144,9 +149,11 @@ Don't make the new functions public.
      }
  #ifndef OPENSSL_NO_SCTP
      if (SSL_IS_DTLS(s) && BIO_dgram_is_sctp(SSL_get_wbio(s))) {
+diff --git a/test/sslapitest.c b/test/sslapitest.c
+index 9ae70d26b9..e9cdf32b3e 100644
 --- a/test/sslapitest.c
 +++ b/test/sslapitest.c
-@@ -10931,7 +10931,6 @@ static int test_quic_api_version(int cln
+@@ -11031,7 +11031,6 @@ static int test_quic_api_version(int clnt, int srvr)
      static const char *client_str = "CLIENT";
      const uint8_t *peer_str;
      size_t peer_str_len;
@@ -154,7 +161,7 @@ Don't make the new functions public.
  
      TEST_info("original clnt=0x%X, srvr=0x%X\n", clnt, srvr);
  
-@@ -10954,10 +10953,8 @@ static int test_quic_api_version(int cln
+@@ -11054,10 +11053,8 @@ static int test_quic_api_version(int clnt, int srvr)
              || !TEST_true(SSL_set_app_data(clientssl, serverssl))
              || !TEST_true(test_quic_api_set_versions(clientssl, clnt))
              || !TEST_true(test_quic_api_set_versions(serverssl, srvr))
@@ -166,7 +173,7 @@ Don't make the new functions public.
              || !TEST_true(SSL_version(serverssl) == TLS1_3_VERSION)
              || !TEST_true(SSL_version(clientssl) == TLS1_3_VERSION)
              || !(TEST_int_eq(SSL_quic_read_level(clientssl), ssl_encryption_application))
-@@ -11079,7 +11076,6 @@ static int quic_setupearly_data_test(SSL
+@@ -11179,7 +11176,6 @@ static int quic_setupearly_data_test(SSL_CTX **cctx, SSL_CTX **sctx,
  {
      static const char *server_str = "SERVER";
      static const char *client_str = "CLIENT";
@@ -174,7 +181,7 @@ Don't make the new functions public.
  
      if (*sctx == NULL
              && (!TEST_true(create_ssl_ctx_pair(libctx, TLS_server_method(),
-@@ -11157,10 +11153,8 @@ static int quic_setupearly_data_test(SSL
+@@ -11257,10 +11253,8 @@ static int quic_setupearly_data_test(SSL_CTX **cctx, SSL_CTX **sctx,
      if (sess == NULL)
          return 1;
  
@@ -187,7 +194,7 @@ Don't make the new functions public.
          return 0;
  
      /* Deal with two NewSessionTickets */
-@@ -11199,15 +11193,12 @@ static int test_quic_early_data(int tst)
+@@ -11299,15 +11293,12 @@ static int test_quic_early_data(int tst)
      SSL *clientssl = NULL, *serverssl = NULL;
      int testresult = 0;
      SSL_SESSION *sess = NULL;
@@ -204,3 +211,6 @@ Don't make the new functions public.
              || !TEST_true(SSL_get_early_data_status(serverssl)))
          goto end;
  
+-- 
+2.47.3
+

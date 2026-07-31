@@ -1,4 +1,4 @@
-From e662060166f881e94d14702c1fda2b4fbdeeb041 Mon Sep 17 00:00:00 2001
+From 7f715b351b727d0ca07c20882ad615e5e746e533 Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Wed, 3 Mar 2021 17:43:46 -0500
 Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
@@ -11,6 +11,8 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
  ssl/statem/statem_lib.c |  4 ++--
  5 files changed, 15 insertions(+), 16 deletions(-)
 
+diff --git a/ssl/s3_msg.c b/ssl/s3_msg.c
+index 38262bf85a..c4d135e39d 100644
 --- a/ssl/s3_msg.c
 +++ b/ssl/s3_msg.c
 @@ -85,7 +85,7 @@ int ssl3_dispatch_alert(SSL *s)
@@ -22,9 +24,11 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
              return 0;
          }
          i = 1;
+diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
+index adf4567012..2e85846f0a 100644
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
-@@ -1840,7 +1840,7 @@ int ssl_read_internal(SSL *s, void *buf,
+@@ -1840,7 +1840,7 @@ int ssl_read_internal(SSL *s, void *buf, size_t num, size_t *readbytes)
  {
  #ifndef OPENSSL_NO_QUIC
      if (SSL_IS_QUIC(s)) {
@@ -33,7 +37,7 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
          return -1;
      }
  #endif
-@@ -1976,7 +1976,7 @@ static int ssl_peek_internal(SSL *s, voi
+@@ -1976,7 +1976,7 @@ static int ssl_peek_internal(SSL *s, void *buf, size_t num, size_t *readbytes)
  {
  #ifndef OPENSSL_NO_QUIC
      if (SSL_IS_QUIC(s)) {
@@ -42,7 +46,7 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
          return -1;
      }
  #endif
-@@ -2041,7 +2041,7 @@ int ssl_write_internal(SSL *s, const voi
+@@ -2041,7 +2041,7 @@ int ssl_write_internal(SSL *s, const void *buf, size_t num, size_t *written)
  {
  #ifndef OPENSSL_NO_QUIC
      if (SSL_IS_QUIC(s)) {
@@ -51,9 +55,11 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
          return -1;
      }
  #endif
+diff --git a/ssl/ssl_quic.c b/ssl/ssl_quic.c
+index 477a386da3..d50b1247a6 100644
 --- a/ssl/ssl_quic.c
 +++ b/ssl/ssl_quic.c
-@@ -131,7 +131,7 @@ int SSL_provide_quic_data(SSL *ssl, OSSL
+@@ -131,7 +131,7 @@ int SSL_provide_quic_data(SSL *ssl, OSSL_ENCRYPTION_LEVEL level,
      size_t l, offset;
  
      if (!SSL_IS_QUIC(ssl)) {
@@ -62,7 +68,7 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
          return 0;
      }
  
-@@ -139,18 +139,18 @@ int SSL_provide_quic_data(SSL *ssl, OSSL
+@@ -139,18 +139,18 @@ int SSL_provide_quic_data(SSL *ssl, OSSL_ENCRYPTION_LEVEL level,
      if (level < ssl->quic_read_level
              || (ssl->quic_input_data_tail != NULL && level < ssl->quic_input_data_tail->level)
              || level < ssl->quic_latest_level_received) {
@@ -84,7 +90,7 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
              BUF_MEM_free(buf);
              return 0;
          }
-@@ -163,15 +163,14 @@ int SSL_provide_quic_data(SSL *ssl, OSSL
+@@ -163,15 +163,14 @@ int SSL_provide_quic_data(SSL *ssl, OSSL_ENCRYPTION_LEVEL level,
      /* A TLS message must not cross an encryption level boundary */
      if (ssl->quic_buf->length != ssl->quic_next_record_start
              && level != ssl->quic_latest_level_received) {
@@ -102,7 +108,7 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
          return 0;
      }
      memcpy(ssl->quic_buf->data + offset, data, len);
-@@ -193,7 +192,7 @@ int SSL_provide_quic_data(SSL *ssl, OSSL
+@@ -193,7 +192,7 @@ int SSL_provide_quic_data(SSL *ssl, OSSL_ENCRYPTION_LEVEL level,
  
          qd = OPENSSL_zalloc(sizeof(*qd));
          if (qd == NULL) {
@@ -111,7 +117,7 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
              return 0;
          }
  
-@@ -305,7 +304,7 @@ int SSL_process_quic_post_handshake(SSL
+@@ -305,7 +304,7 @@ int SSL_process_quic_post_handshake(SSL *ssl)
      int ret;
  
      if (SSL_in_init(ssl) || !SSL_IS_QUIC(ssl)) {
@@ -120,9 +126,11 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
          return 0;
      }
  
+diff --git a/ssl/statem/statem.c b/ssl/statem/statem.c
+index 124824d3c8..6d5544359e 100644
 --- a/ssl/statem/statem.c
 +++ b/ssl/statem/statem.c
-@@ -928,7 +928,7 @@ int statem_flush(SSL *s)
+@@ -904,7 +904,7 @@ int statem_flush(SSL *s)
  #ifndef OPENSSL_NO_QUIC
      if (SSL_IS_QUIC(s)) {
          if (!s->quic_method->flush_flight(s)) {
@@ -131,6 +139,8 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
              return 0;
          }
      } else
+diff --git a/ssl/statem/statem_lib.c b/ssl/statem/statem_lib.c
+index 57c98e3cbf..f9594d6038 100644
 --- a/ssl/statem/statem_lib.c
 +++ b/ssl/statem/statem_lib.c
 @@ -54,14 +54,14 @@ int ssl3_do_write(SSL *s, int type)
@@ -150,3 +160,6 @@ Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
          }
      } else
  #endif
+-- 
+2.47.3
+

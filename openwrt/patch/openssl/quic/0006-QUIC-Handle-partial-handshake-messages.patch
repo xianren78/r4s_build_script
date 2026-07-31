@@ -1,4 +1,4 @@
-From 0c9c5b370c5d5d7d0adf8defacd68aa0455f2cbf Mon Sep 17 00:00:00 2001
+From 2d96cf4269eea50ccd3e1a41448f7152533ac830 Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Thu, 15 Aug 2019 13:26:32 -0400
 Subject: [PATCH 06/43] QUIC: Handle partial handshake messages
@@ -8,6 +8,8 @@ Subject: [PATCH 06/43] QUIC: Handle partial handshake messages
  ssl/ssl_quic.c  | 28 ++++++++++++++++++++++------
  2 files changed, 23 insertions(+), 6 deletions(-)
 
+diff --git a/ssl/ssl_local.h b/ssl/ssl_local.h
+index 6d52e54b39..b5188d3dc1 100644
 --- a/ssl/ssl_local.h
 +++ b/ssl/ssl_local.h
 @@ -1238,6 +1238,7 @@ typedef struct cert_pkey_st CERT_PKEY;
@@ -18,9 +20,11 @@ Subject: [PATCH 06/43] QUIC: Handle partial handshake messages
      size_t length;
  };
  typedef struct quic_data_st QUIC_DATA;
+diff --git a/ssl/ssl_quic.c b/ssl/ssl_quic.c
+index 7ece8af9bb..0959bcf2cf 100644
 --- a/ssl/ssl_quic.c
 +++ b/ssl/ssl_quic.c
-@@ -114,15 +114,26 @@ int SSL_provide_quic_data(SSL *ssl, OSSL
+@@ -114,15 +114,26 @@ int SSL_provide_quic_data(SSL *ssl, OSSL_ENCRYPTION_LEVEL level,
          QUIC_DATA *qd;
          const uint8_t *p = data + 1;
  
@@ -53,7 +57,7 @@ Subject: [PATCH 06/43] QUIC: Handle partial handshake messages
          if (qd == NULL) {
              SSLerr(SSL_F_SSL_PROVIDE_QUIC_DATA, ERR_R_INTERNAL_ERROR);
              return 0;
-@@ -131,6 +142,11 @@ int SSL_provide_quic_data(SSL *ssl, OSSL
+@@ -131,6 +142,11 @@ int SSL_provide_quic_data(SSL *ssl, OSSL_ENCRYPTION_LEVEL level,
          qd->next = NULL;
          qd->length = l;
          qd->level = level;
@@ -65,3 +69,6 @@ Subject: [PATCH 06/43] QUIC: Handle partial handshake messages
          memcpy((void*)(qd + 1), data, l);
          if (ssl->quic_input_data_tail != NULL)
              ssl->quic_input_data_tail->next = qd;
+-- 
+2.47.3
+

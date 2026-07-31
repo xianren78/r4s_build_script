@@ -1,4 +1,4 @@
-From e5b708383649146cbba45373bdf15a2e3c39240a Mon Sep 17 00:00:00 2001
+From ad1a29fb419684e46366cd572cf94b8c37e9c861 Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Fri, 9 Jul 2021 13:29:03 -0400
 Subject: [PATCH 36/43] QUIC: Don't muck with FIPS checksums
@@ -14,6 +14,8 @@ Subject: [PATCH 36/43] QUIC: Don't muck with FIPS checksums
  7 files changed, 30 insertions(+), 10 deletions(-)
  create mode 100644 include/openssl/quic.h
 
+diff --git a/apps/info.c b/apps/info.c
+index 91d21f4abb..3d292a0a43 100644
 --- a/apps/info.c
 +++ b/apps/info.c
 @@ -10,6 +10,7 @@
@@ -24,6 +26,8 @@ Subject: [PATCH 36/43] QUIC: Don't muck with FIPS checksums
  
  typedef enum OPTION_choice {
      OPT_COMMON,
+diff --git a/crypto/info.c b/crypto/info.c
+index 3a13edf779..c546994690 100644
 --- a/crypto/info.c
 +++ b/crypto/info.c
 @@ -14,6 +14,7 @@
@@ -34,6 +38,8 @@ Subject: [PATCH 36/43] QUIC: Don't muck with FIPS checksums
  
  #if defined(__arm__) || defined(__arm) || defined(__aarch64__)
  #include "arm_arch.h"
+diff --git a/include/openssl/crypto.h.in b/include/openssl/crypto.h.in
+index 77b454af94..89c82b8b9d 100644
 --- a/include/openssl/crypto.h.in
 +++ b/include/openssl/crypto.h.in
 @@ -180,10 +180,6 @@ const char *OPENSSL_info(int type);
@@ -47,9 +53,11 @@ Subject: [PATCH 36/43] QUIC: Don't muck with FIPS checksums
  int OPENSSL_issetugid(void);
  
  struct crypto_ex_data_st {
+diff --git a/include/openssl/evp.h b/include/openssl/evp.h
+index 6a5f73aabe..164f6d6472 100644
 --- a/include/openssl/evp.h
 +++ b/include/openssl/evp.h
-@@ -1731,10 +1731,6 @@ int EVP_PKEY_CTX_set_mac_key(EVP_PKEY_CT
+@@ -1731,10 +1731,6 @@ int EVP_PKEY_CTX_set_mac_key(EVP_PKEY_CTX *ctx, const unsigned char *key,
   */
  #define EVP_PKEY_FLAG_SIGCTX_CUSTOM 4
  
@@ -60,6 +68,9 @@ Subject: [PATCH 36/43] QUIC: Don't muck with FIPS checksums
  #ifndef OPENSSL_NO_DEPRECATED_3_0
  OSSL_DEPRECATEDIN_3_0 const EVP_PKEY_METHOD *EVP_PKEY_meth_find(int type);
  OSSL_DEPRECATEDIN_3_0 EVP_PKEY_METHOD *EVP_PKEY_meth_new(int id, int flags);
+diff --git a/include/openssl/quic.h b/include/openssl/quic.h
+new file mode 100644
+index 0000000000..f95e9e8819
 --- /dev/null
 +++ b/include/openssl/quic.h
 @@ -0,0 +1,19 @@
@@ -82,9 +93,11 @@ Subject: [PATCH 36/43] QUIC: Don't muck with FIPS checksums
 +
 +# endif /* OPENSSL_NO_QUIC */
 +#endif /* OPENSSL_QUIC_H */
+diff --git a/include/openssl/ssl.h.in b/include/openssl/ssl.h.in
+index 58e340f31a..a5c455d903 100644
 --- a/include/openssl/ssl.h.in
 +++ b/include/openssl/ssl.h.in
-@@ -2535,6 +2535,15 @@ const char *OSSL_default_ciphersuites(vo
+@@ -2535,6 +2535,15 @@ const char *OSSL_default_ciphersuites(void);
   * ssl_encryption_level_t represents a specific QUIC encryption level used to
   * transmit handshake messages. BoringSSL has this as an 'enum'.
   */
@@ -100,9 +113,11 @@ Subject: [PATCH 36/43] QUIC: Don't muck with FIPS checksums
  typedef enum ssl_encryption_level_t {
      ssl_encryption_initial = 0,
      ssl_encryption_early_data,
+diff --git a/include/openssl/types.h b/include/openssl/types.h
+index 1511de2888..a3806b0265 100644
 --- a/include/openssl/types.h
 +++ b/include/openssl/types.h
-@@ -229,8 +229,6 @@ typedef struct ossl_decoder_ctx_st OSSL_
+@@ -231,8 +231,6 @@ typedef struct ossl_decoder_ctx_st OSSL_DECODER_CTX;
  
  typedef struct ossl_self_test_st OSSL_SELF_TEST;
  
@@ -111,3 +126,6 @@ Subject: [PATCH 36/43] QUIC: Don't muck with FIPS checksums
  #ifdef __cplusplus
  }
  #endif
+-- 
+2.47.3
+

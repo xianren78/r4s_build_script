@@ -1,4 +1,4 @@
-From 6e4c15e6bd52743d79956d3d149c70e021f47d11 Mon Sep 17 00:00:00 2001
+From 3efdfc4c60b80f0bb9a4ae8c41cf7b0b2ba45792 Mon Sep 17 00:00:00 2001
 From: Benjamin Kaduk <bkaduk@akamai.com>
 Date: Tue, 1 Sep 2020 15:10:41 -0700
 Subject: [PATCH 24/43] QUIC: Enforce consistent encryption level for handshake
@@ -11,6 +11,8 @@ encryption level boundaries, but we were not previously enforcing this.
  ssl/ssl_quic.c  | 12 +++++++++++-
  2 files changed, 12 insertions(+), 1 deletion(-)
 
+diff --git a/ssl/ssl_local.h b/ssl/ssl_local.h
+index 0399f96370..4571390422 100644
 --- a/ssl/ssl_local.h
 +++ b/ssl/ssl_local.h
 @@ -1734,6 +1734,7 @@ struct ssl_st {
@@ -21,9 +23,11 @@ encryption level boundaries, but we were not previously enforcing this.
      BUF_MEM *quic_buf;          /* buffer incoming handshake messages */
      QUIC_DATA *quic_input_data_head;
      QUIC_DATA *quic_input_data_tail;
+diff --git a/ssl/ssl_quic.c b/ssl/ssl_quic.c
+index e396720551..136d2b8460 100644
 --- a/ssl/ssl_quic.c
 +++ b/ssl/ssl_quic.c
-@@ -100,7 +100,8 @@ int SSL_provide_quic_data(SSL *ssl, OSSL
+@@ -100,7 +100,8 @@ int SSL_provide_quic_data(SSL *ssl, OSSL_ENCRYPTION_LEVEL level,
  
      /* Level can be different than the current read, but not less */
      if (level < ssl->quic_read_level
@@ -33,7 +37,7 @@ encryption level boundaries, but we were not previously enforcing this.
          SSLerr(SSL_F_SSL_PROVIDE_QUIC_DATA, SSL_R_WRONG_ENCRYPTION_LEVEL_RECEIVED);
          return 0;
      }
-@@ -122,6 +123,15 @@ int SSL_provide_quic_data(SSL *ssl, OSSL
+@@ -122,6 +123,15 @@ int SSL_provide_quic_data(SSL *ssl, OSSL_ENCRYPTION_LEVEL level,
          buf = NULL;
      }
  
@@ -49,3 +53,6 @@ encryption level boundaries, but we were not previously enforcing this.
      offset = ssl->quic_buf->length;
      if (!BUF_MEM_grow(ssl->quic_buf, offset + len)) {
          SSLerr(SSL_F_SSL_PROVIDE_QUIC_DATA, ERR_R_INTERNAL_ERROR);
+-- 
+2.47.3
+

@@ -1,4 +1,4 @@
-From db0ea38b914f434c1faa0a140a3ce5f9dfa8d248 Mon Sep 17 00:00:00 2001
+From 86b12ef418a65654ed9f61efa5080723466e15b7 Mon Sep 17 00:00:00 2001
 From: Todd Short <tmshort@users.noreply.github.com>
 Date: Thu, 18 Mar 2021 12:42:01 -0400
 Subject: [PATCH 34/43] QUIC: Fix CI
@@ -13,6 +13,8 @@ Fixes an issue with extension defintions and `no-quic`
  ssl/statem/extensions_srvr.c | 2 +-
  4 files changed, 10 insertions(+), 2 deletions(-)
 
+diff --git a/Configure b/Configure
+index 1a59ebbf2d..16700f3790 100755
 --- a/Configure
 +++ b/Configure
 @@ -579,6 +579,7 @@ my @disable_cascades = (
@@ -32,9 +34,11 @@ Fixes an issue with extension defintions and `no-quic`
      "dgram"             => [ "dtls", "sctp" ],
      "sock"              => [ "dgram" ],
      "dtls"              => [ @dtls ],
+diff --git a/doc/build.info b/doc/build.info
+index 30f519338a..89dcd1c10d 100644
 --- a/doc/build.info
 +++ b/doc/build.info
-@@ -2283,6 +2283,10 @@ DEPEND[html/man3/SSL_CTX_set_psk_client_
+@@ -2283,6 +2283,10 @@ DEPEND[html/man3/SSL_CTX_set_psk_client_callback.html]=man3/SSL_CTX_set_psk_clie
  GENERATE[html/man3/SSL_CTX_set_psk_client_callback.html]=man3/SSL_CTX_set_psk_client_callback.pod
  DEPEND[man/man3/SSL_CTX_set_psk_client_callback.3]=man3/SSL_CTX_set_psk_client_callback.pod
  GENERATE[man/man3/SSL_CTX_set_psk_client_callback.3]=man3/SSL_CTX_set_psk_client_callback.pod
@@ -45,7 +49,7 @@ Fixes an issue with extension defintions and `no-quic`
  DEPEND[html/man3/SSL_CTX_set_quiet_shutdown.html]=man3/SSL_CTX_set_quiet_shutdown.pod
  GENERATE[html/man3/SSL_CTX_set_quiet_shutdown.html]=man3/SSL_CTX_set_quiet_shutdown.pod
  DEPEND[man/man3/SSL_CTX_set_quiet_shutdown.3]=man3/SSL_CTX_set_quiet_shutdown.pod
-@@ -3366,6 +3370,7 @@ html/man3/SSL_CTX_set_msg_callback.html
+@@ -3366,6 +3370,7 @@ html/man3/SSL_CTX_set_msg_callback.html \
  html/man3/SSL_CTX_set_num_tickets.html \
  html/man3/SSL_CTX_set_options.html \
  html/man3/SSL_CTX_set_psk_client_callback.html \
@@ -61,9 +65,11 @@ Fixes an issue with extension defintions and `no-quic`
  man/man3/SSL_CTX_set_quiet_shutdown.3 \
  man/man3/SSL_CTX_set_read_ahead.3 \
  man/man3/SSL_CTX_set_record_padding_callback.3 \
+diff --git a/ssl/statem/extensions.c b/ssl/statem/extensions.c
+index 16ba7abe1a..cefef76f40 100644
 --- a/ssl/statem/extensions.c
 +++ b/ssl/statem/extensions.c
-@@ -356,6 +356,7 @@ static const EXTENSION_DEFINITION ext_de
+@@ -356,6 +356,7 @@ static const EXTENSION_DEFINITION ext_defs[] = {
      },
  #else
      INVALID_EXTENSION,
@@ -71,9 +77,11 @@ Fixes an issue with extension defintions and `no-quic`
  #endif
      { /* Must be immediately before pre_shared_key */
          TLSEXT_TYPE_padding,
+diff --git a/ssl/statem/extensions_srvr.c b/ssl/statem/extensions_srvr.c
+index 580a78fc49..1091eaff2b 100644
 --- a/ssl/statem/extensions_srvr.c
 +++ b/ssl/statem/extensions_srvr.c
-@@ -1932,7 +1932,7 @@ EXT_RETURN tls_construct_stoc_early_data
+@@ -1941,7 +1941,7 @@ EXT_RETURN tls_construct_stoc_early_data(SSL *s, WPACKET *pkt,
  
  #ifndef OPENSSL_NO_QUIC
          /* QUIC server must always send 0xFFFFFFFF, per draft-ietf-quic-tls-27 S4.5 */
@@ -82,3 +90,6 @@ Fixes an issue with extension defintions and `no-quic`
              max_early_data = 0xFFFFFFFF;
  #endif
  
+-- 
+2.47.3
+
