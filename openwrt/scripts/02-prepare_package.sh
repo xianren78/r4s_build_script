@@ -131,6 +131,10 @@ sed -i 's/解除网易云音乐播放限制/网易云音乐解锁/g' package/new
 # Theme
 git clone https://$github/xianren78/luci-theme-argon -b openwrt-25.12 package/new/luci-theme-argon --depth=1
 
+# luci-theme-bootstrap SPA
+rm -rf feeds/luci/themes/luci-theme-bootstrap
+git clone https://$github/sbwml/luci-theme-bootstrap feeds/luci/themes/luci-theme-bootstrap
+
 # Mosdns
 git clone https://$github/xianren78/luci-app-mosdns -b v5 package/new/mosdns --depth=1
 
