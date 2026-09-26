@@ -1,7 +1,7 @@
-From 9feb37b3456eaa738e6f557c8a7daad167b909b4 Mon Sep 17 00:00:00 2001
+From 5d9c8bc1e233670e1a1611fb0dd83e9ca418afa9 Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Mon, 26 Aug 2019 13:29:17 -0400
-Subject: [PATCH 07/43] QUIC: Fix quic_transport constructors/parsers
+Subject: [PATCH 07/44] QUIC: Fix quic_transport constructors/parsers
 
 ---
  ssl/statem/extensions_clnt.c | 16 +++-------------

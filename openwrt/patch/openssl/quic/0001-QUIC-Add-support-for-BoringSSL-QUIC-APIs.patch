@@ -1,7 +1,7 @@
-From 9877d645df7fb5de8b9ddc3cdc31a06cea469306 Mon Sep 17 00:00:00 2001
+From e3f4f7c64a43927099e8b6de8d0d73f4cd0f233f Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Fri, 12 Apr 2019 11:13:25 -0400
-Subject: [PATCH 01/43] QUIC: Add support for BoringSSL QUIC APIs
+Subject: [PATCH 01/44] QUIC: Add support for BoringSSL QUIC APIs
 
 This adds a compatible API for BoringSSL's QUIC support, based
 on the current |draft-ietf-quic-tls|.
@@ -87,7 +87,7 @@ index 5a90ff9475..25d33cb77f 100644
  
  Don't use hardware RDRAND capabilities.
 diff --git a/crypto/err/openssl.txt b/crypto/err/openssl.txt
-index dc4e3f310f..8381458a10 100644
+index 13b72c0041..06af30499f 100644
 --- a/crypto/err/openssl.txt
 +++ b/crypto/err/openssl.txt
 @@ -1254,6 +1254,7 @@ SSL_R_AT_LEAST_TLS_1_2_NEEDED_IN_SUITEB_MODE:158:\

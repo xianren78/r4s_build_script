@@ -1,7 +1,7 @@
-From f74a77c39458eb33d7973b81fbcbfcf32a2b1fa4 Mon Sep 17 00:00:00 2001
+From 1cd74ca0009e4c98cc806a2a5f33daf1207a9b4b Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Fri, 30 Aug 2019 11:38:56 -0400
-Subject: [PATCH 15/43] QUIC: Tweeks to quic_change_cipher_state()
+Subject: [PATCH 15/44] QUIC: Tweeks to quic_change_cipher_state()
 
 ---
  ssl/tls13_enc.c | 69 +++++++++++++++++--------------------------------

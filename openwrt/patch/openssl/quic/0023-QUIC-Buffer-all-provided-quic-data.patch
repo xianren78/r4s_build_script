@@ -1,7 +1,7 @@
-From 948e49246791b869103a46d05c72437a4273e776 Mon Sep 17 00:00:00 2001
+From 9996ce667ad22eec8168334eaaa755bd4a1242a3 Mon Sep 17 00:00:00 2001
 From: Benjamin Kaduk <bkaduk@akamai.com>
 Date: Mon, 31 Aug 2020 12:27:33 -0700
-Subject: [PATCH 23/43] QUIC: Buffer all provided quic data
+Subject: [PATCH 23/44] QUIC: Buffer all provided quic data
 
 Make all data supplied via SSL_provide_quic_data() pass through an
 internal buffer, so that we can handle data supplied with arbitrary

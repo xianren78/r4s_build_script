@@ -1,7 +1,7 @@
-From 9c3ccb19e0ec6590f643f138db29fdc856ea6d27 Mon Sep 17 00:00:00 2001
+From e37c8e179fdc3ff3e7fd5f86d75dcc4528ae1f6f Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Thu, 29 Aug 2019 12:03:48 -0400
-Subject: [PATCH 09/43] QUIC: Don't process an incomplete message
+Subject: [PATCH 09/44] QUIC: Don't process an incomplete message
 
 ---
  ssl/statem/statem_quic.c | 9 ++++-----

@@ -1,7 +1,7 @@
-From 26a9eb7b44b05d72111ed8ac0ab4a7f3d9a2141a Mon Sep 17 00:00:00 2001
+From 0b6958c8efb280553d31e4be7499d7186b70bbac Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Fri, 30 Aug 2019 09:15:31 -0400
-Subject: [PATCH 12/43] QUIC: Add OPENSSL_NO_QUIC wrapper
+Subject: [PATCH 12/44] QUIC: Add OPENSSL_NO_QUIC wrapper
 
 ---
  ssl/ssl_local.h | 2 ++

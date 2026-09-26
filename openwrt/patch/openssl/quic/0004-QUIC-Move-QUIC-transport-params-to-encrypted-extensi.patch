@@ -1,7 +1,7 @@
-From 182c3b1324c760c6fab330ac4930497ab0a31914 Mon Sep 17 00:00:00 2001
+From 5067019ce36c0ebef3eccb88cd028c037288a93c Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Thu, 15 Aug 2019 11:35:10 -0400
-Subject: [PATCH 04/43] QUIC: Move QUIC transport params to encrypted
+Subject: [PATCH 04/44] QUIC: Move QUIC transport params to encrypted
  extensions
 
 ---

@@ -1,7 +1,7 @@
-From 86af7b51e93d7dbdc2eb8c3fc94e867262baf1a8 Mon Sep 17 00:00:00 2001
+From b755c7730081ddd504d51be3f4b2ed05c81fcbdb Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Sat, 12 Dec 2020 17:27:46 +0900
-Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
+Subject: [PATCH 25/44] QUIC: add v1 quic_transport_parameters
 
 ---
  crypto/err/openssl.txt               |   2 +
@@ -22,7 +22,7 @@ Subject: [PATCH 25/43] QUIC: add v1 quic_transport_parameters
  15 files changed, 323 insertions(+), 38 deletions(-)
 
 diff --git a/crypto/err/openssl.txt b/crypto/err/openssl.txt
-index 8381458a10..739a42ad29 100644
+index 06af30499f..f745f66361 100644
 --- a/crypto/err/openssl.txt
 +++ b/crypto/err/openssl.txt
 @@ -1392,6 +1392,8 @@ SSL_R_MISSING_ECDSA_SIGNING_CERT:381:missing ecdsa signing cert

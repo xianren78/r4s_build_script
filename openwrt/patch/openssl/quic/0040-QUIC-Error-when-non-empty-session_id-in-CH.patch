@@ -1,14 +1,14 @@
-From 87fb7e3161d6090146bacec8fa002eeef66e50bc Mon Sep 17 00:00:00 2001
+From 2709a4da30156596736469d55454ea3dbe9155f3 Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Mon, 18 Oct 2021 16:54:31 -0400
-Subject: [PATCH 40/43] QUIC: Error when non-empty session_id in CH
+Subject: [PATCH 40/44] QUIC: Error when non-empty session_id in CH
 
 ---
  ssl/statem/statem_srvr.c | 9 +++++++++
  1 file changed, 9 insertions(+)
 
 diff --git a/ssl/statem/statem_srvr.c b/ssl/statem/statem_srvr.c
-index 97614ff402..189ea2bbd0 100644
+index 31b6ac1d2d..6e16a69121 100644
 --- a/ssl/statem/statem_srvr.c
 +++ b/ssl/statem/statem_srvr.c
 @@ -1574,6 +1574,15 @@ MSG_PROCESS_RETURN tls_process_client_hello(SSL *s, PACKET *pkt)

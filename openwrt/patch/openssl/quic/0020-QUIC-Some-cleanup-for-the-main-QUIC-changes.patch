@@ -1,7 +1,7 @@
-From d9270e6d2454c21475b3aab8e014ea75456a80ba Mon Sep 17 00:00:00 2001
+From fa9754cf9812c4a6707ab40787cf7e269f9f7c03 Mon Sep 17 00:00:00 2001
 From: Benjamin Kaduk <bkaduk@akamai.com>
 Date: Wed, 22 Apr 2020 09:12:36 -0700
-Subject: [PATCH 20/43] QUIC: Some cleanup for the main QUIC changes
+Subject: [PATCH 20/44] QUIC: Some cleanup for the main QUIC changes
 
 Try to reduce unneeded whitespace changes and wrap new code to 80 columns.
 Reword documentation to attempt to improve clarity.

@@ -1,7 +1,7 @@
-From 7460614767f582820df790009e8f9a9be1e96e7b Mon Sep 17 00:00:00 2001
+From 3217bcdd5abd2b6e37fd5337c2525b555f3f7feb Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Fri, 29 Oct 2021 14:15:06 -0400
-Subject: [PATCH 42/43] QUIC: Better SSL_clear()
+Subject: [PATCH 42/44] QUIC: Better SSL_clear()
 
 Undo SSL_clear() changes in test
 Break apart SSL_clear() into SSL_clear_quic() and SSL_clear_not_quic()

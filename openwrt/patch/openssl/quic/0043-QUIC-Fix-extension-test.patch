@@ -1,7 +1,7 @@
-From 12ac417f1554969e4ee55349cb0d9c9475d70299 Mon Sep 17 00:00:00 2001
+From 10d8cc2f89c06066fe83effbf023f6a34a8fa800 Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Tue, 1 Nov 2022 12:55:46 -0400
-Subject: [PATCH 43/43] QUIC: Fix extension test
+Subject: [PATCH 43/44] QUIC: Fix extension test
 
 ---
  ssl/ssl_local.h          | 4 ++--

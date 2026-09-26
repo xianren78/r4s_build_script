@@ -1,7 +1,7 @@
-From cdbe13e1113a080f5ca9c209a8d3a53d84693bca Mon Sep 17 00:00:00 2001
+From 315e68ba1c57bb389a5891e41d35a858be8d6c49 Mon Sep 17 00:00:00 2001
 From: Todd Short <todd.short@me.com>
 Date: Fri, 5 Mar 2021 15:22:18 -0500
-Subject: [PATCH 30/43] QUIC: Add compile/run-time checking for QUIC
+Subject: [PATCH 30/44] QUIC: Add compile/run-time checking for QUIC
 
 ---
  apps/info.c                  | 12 ++++++++++++

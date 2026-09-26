@@ -1,7 +1,7 @@
-From 8e5fd6c6e236440bbe6306c203c2ca2670583a7a Mon Sep 17 00:00:00 2001
+From aecf9281c111c641d950c5498a1cb349d7efcaa7 Mon Sep 17 00:00:00 2001
 From: Benjamin Kaduk <bkaduk@akamai.com>
 Date: Fri, 15 Jan 2021 15:04:00 -0800
-Subject: [PATCH 27/43] QUIC: __owur makes no sense for void return values
+Subject: [PATCH 27/44] QUIC: __owur makes no sense for void return values
 
 ---
  include/openssl/ssl.h.in | 2 +-

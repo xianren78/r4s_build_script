@@ -1,7 +1,7 @@
-From d69796054a8c4cf8dd31d1acb2cbc255bb84288e Mon Sep 17 00:00:00 2001
+From 446f488a948c4318eeb3e1ad4e68c0cba81f065c Mon Sep 17 00:00:00 2001
 From: Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
 Date: Thu, 11 Mar 2021 23:07:55 +0900
-Subject: [PATCH 31/43] QUIC: Add early data support
+Subject: [PATCH 31/44] QUIC: Add early data support
 
 * QUIC: Add early data support
 
@@ -186,7 +186,7 @@ index d50b1247a6..9d4c801411 100644
 +    ssl->early_data_state = SSL_EARLY_DATA_CONNECTING;
 +}
 diff --git a/ssl/statem/statem_srvr.c b/ssl/statem/statem_srvr.c
-index 84c46cc475..97614ff402 100644
+index a498c687c0..31b6ac1d2d 100644
 --- a/ssl/statem/statem_srvr.c
 +++ b/ssl/statem/statem_srvr.c
 @@ -962,6 +962,16 @@ WORK_STATE ossl_statem_server_post_work(SSL *s, WORK_STATE wst)

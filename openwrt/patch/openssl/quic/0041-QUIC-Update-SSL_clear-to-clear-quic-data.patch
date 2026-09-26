@@ -1,7 +1,7 @@
-From 9dcbc0c409a6ddb1ad0835c154ce1b6224c38ffc Mon Sep 17 00:00:00 2001
+From 132384e26d83570c59110f117fa27eecc47a05d0 Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Tue, 19 Oct 2021 12:13:31 -0400
-Subject: [PATCH 41/43] QUIC: Update SSL_clear() to clear quic data
+Subject: [PATCH 41/44] QUIC: Update SSL_clear() to clear quic data
 
 Had to fixup tests because SSL_accept() eventually calls SSL_clear() and
 it was removing the inital ClientHello sent via SSL_provide_quic_data()

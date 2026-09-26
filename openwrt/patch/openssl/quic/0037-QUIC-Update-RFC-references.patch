@@ -1,7 +1,7 @@
-From 3a0be60a4b21773410d91968ec353c3707f93282 Mon Sep 17 00:00:00 2001
+From 803624da91855bc352117d69566a61e58e56e11b Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Tue, 7 Sep 2021 12:26:10 -0400
-Subject: [PATCH 37/43] QUIC: Update RFC references
+Subject: [PATCH 37/44] QUIC: Update RFC references
 
 ---
  doc/man3/SSL_CTX_set_quic_method.pod | 11 +++++------
@@ -81,7 +81,7 @@ index 1091eaff2b..3364e0f2c7 100644
              max_early_data = 0xFFFFFFFF;
  #endif
 diff --git a/ssl/statem/statem_clnt.c b/ssl/statem/statem_clnt.c
-index 451e39c1ed..e140d7d249 100644
+index 91bfbb2607..886703665b 100644
 --- a/ssl/statem/statem_clnt.c
 +++ b/ssl/statem/statem_clnt.c
 @@ -903,7 +903,7 @@ int ossl_statem_client_construct_message(SSL *s, WPACKET *pkt,

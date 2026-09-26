@@ -1,7 +1,7 @@
-From 6ad75bf95fa2631e3c834d943b36d95e18c70cda Mon Sep 17 00:00:00 2001
+From 5290c248ed2b86584b3780533f53877c4fbd4884 Mon Sep 17 00:00:00 2001
 From: Benjamin Kaduk <bkaduk@akamai.com>
 Date: Tue, 7 Sep 2021 14:21:22 -0700
-Subject: [PATCH 39/43] QUIC: use SSL_IS_QUIC() in more places
+Subject: [PATCH 39/44] QUIC: use SSL_IS_QUIC() in more places
 
 ---
  doc/man3/SSL_CTX_set_quic_method.pod | 2 +-
@@ -36,7 +36,7 @@ index 889eff70f7..0bc863e604 100644
              return 0;
          }
 diff --git a/ssl/statem/statem_clnt.c b/ssl/statem/statem_clnt.c
-index e140d7d249..94ae1c1ba8 100644
+index 886703665b..3500e698d5 100644
 --- a/ssl/statem/statem_clnt.c
 +++ b/ssl/statem/statem_clnt.c
 @@ -904,7 +904,7 @@ int ossl_statem_client_construct_message(SSL *s, WPACKET *pkt,

@@ -1,7 +1,7 @@
-From df8d1e3bfc3b5c7dd51b5c01854e477fb77bbdaa Mon Sep 17 00:00:00 2001
+From 2755c0ea97a62d7240245eab76d1b2ef3988626a Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Fri, 30 Aug 2019 11:17:58 -0400
-Subject: [PATCH 14/43] QUIC: Move QUIC code out of tls13_change_cipher_state()
+Subject: [PATCH 14/44] QUIC: Move QUIC code out of tls13_change_cipher_state()
 
 Create quic_change_cipher_state() that does the minimal required
 to generate the QUIC secrets. (e.g. encryption contexts are not

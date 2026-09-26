@@ -1,7 +1,7 @@
-From 995cf088705fb5f1813885638dadf815358969e9 Mon Sep 17 00:00:00 2001
+From 14077313c9a773b3bb9c341ff7875f28e4bfa53a Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Tue, 5 Jan 2021 13:50:21 -0500
-Subject: [PATCH 26/43] QUIC: return success when no post-handshake data
+Subject: [PATCH 26/44] QUIC: return success when no post-handshake data
 
 ---
  ssl/ssl_quic.c | 4 ++++

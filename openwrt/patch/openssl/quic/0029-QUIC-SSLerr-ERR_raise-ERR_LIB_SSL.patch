@@ -1,7 +1,7 @@
-From 7f715b351b727d0ca07c20882ad615e5e746e533 Mon Sep 17 00:00:00 2001
+From 17dd5763925d87b65bb484a471dca3f9b94df7e9 Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Wed, 3 Mar 2021 17:43:46 -0500
-Subject: [PATCH 29/43] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
+Subject: [PATCH 29/44] QUIC: SSLerr() -> ERR_raise(ERR_LIB_SSL)
 
 ---
  ssl/s3_msg.c            |  2 +-

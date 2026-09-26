@@ -1,7 +1,7 @@
-From 73994c829ec73a0a5f96819f0afcb0e6e66e769e Mon Sep 17 00:00:00 2001
+From 772bcdadb151394e30fe06821d9064725a73df04 Mon Sep 17 00:00:00 2001
 From: Benjamin Kaduk <bkaduk@akamai.com>
 Date: Mon, 11 May 2020 13:13:01 -0700
-Subject: [PATCH 21/43] QUIC: Prevent KeyUpdate for QUIC
+Subject: [PATCH 21/44] QUIC: Prevent KeyUpdate for QUIC
 
 QUIC does not use the TLS KeyUpdate message/mechanism, and indeed
 it is an error to generate or receive such a message.  Add the

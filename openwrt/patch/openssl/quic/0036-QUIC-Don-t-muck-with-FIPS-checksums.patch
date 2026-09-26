@@ -1,7 +1,7 @@
-From ad1a29fb419684e46366cd572cf94b8c37e9c861 Mon Sep 17 00:00:00 2001
+From b94c87ce52dce028f02bba951ff8a67da1602a4a Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Fri, 9 Jul 2021 13:29:03 -0400
-Subject: [PATCH 36/43] QUIC: Don't muck with FIPS checksums
+Subject: [PATCH 36/44] QUIC: Don't muck with FIPS checksums
 
 ---
  apps/info.c                 |  1 +

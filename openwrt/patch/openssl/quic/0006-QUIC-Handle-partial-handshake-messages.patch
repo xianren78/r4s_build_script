@@ -1,7 +1,7 @@
-From 2d96cf4269eea50ccd3e1a41448f7152533ac830 Mon Sep 17 00:00:00 2001
+From 9f286506ae77fdb30d7e687ccc2b48fc458be60b Mon Sep 17 00:00:00 2001
 From: Todd Short <tshort@akamai.com>
 Date: Thu, 15 Aug 2019 13:26:32 -0400
-Subject: [PATCH 06/43] QUIC: Handle partial handshake messages
+Subject: [PATCH 06/44] QUIC: Handle partial handshake messages
 
 ---
  ssl/ssl_local.h |  1 +

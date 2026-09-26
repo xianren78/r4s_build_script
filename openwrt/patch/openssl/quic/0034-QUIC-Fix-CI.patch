@@ -1,7 +1,7 @@
-From 86b12ef418a65654ed9f61efa5080723466e15b7 Mon Sep 17 00:00:00 2001
+From fb933b98daf90a72df59bc65928007708611058b Mon Sep 17 00:00:00 2001
 From: Todd Short <tmshort@users.noreply.github.com>
 Date: Thu, 18 Mar 2021 12:42:01 -0400
-Subject: [PATCH 34/43] QUIC: Fix CI
+Subject: [PATCH 34/44] QUIC: Fix CI
 
 Updates `Configure` script to disable QUIC with `no-bulk` and `no-ec`
 Updates build.info doc docs

@@ -1,7 +1,7 @@
-From d780143d3da632641f7fe281720a99ef038faaeb Mon Sep 17 00:00:00 2001
+From e8aeae20b8b906de3c8bfdd6cb717b7142f5210e Mon Sep 17 00:00:00 2001
 From: Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
 Date: Fri, 12 Mar 2021 00:39:20 +0900
-Subject: [PATCH 32/43] QUIC: Make SSL_provide_quic_data accept 0 length data
+Subject: [PATCH 32/44] QUIC: Make SSL_provide_quic_data accept 0 length data
 
 This commit makes SSL_provide_quic_data accept 0 length data, which
 matches BoringSSL behavior.
