@@ -25,7 +25,6 @@ rm -f target/linux/generic/pending-6.18/730-net-ethernet-mtk_eth_soc-reset-all-T
 rm -rf target/linux/mediatek/files-6.6/drivers/net/phy/rtl8261n
 git clone https://$github/xianren78/package_kernel_rtl8261n target/linux/generic/files/drivers/net/phy/rtl8261n
 
-
 #openssl 3.0.19
 rm -f package/libs/openssl/patches/140-allow-prefer-chacha20.patch
 rm -f package/libs/openssl/patches/500-e_devcrypto-default-to-not-use-digests-in-engine.patch
@@ -61,3 +60,29 @@ echo $PUBKEY > files/root/.ssh/authorized_keys
 # inputrc
 touch files/root/.inputrc
 echo "set enable-bracketed-paste off" > files/root/.inputrc
+
+#rustc 1.94.1 required by quickfile
+cd /builder/openwrt
+
+# 下载 Rust 1.94.1 官方源码对应的 SHA256
+rust_sha_file="$(mktemp)"
+curl -fL --retry 3 \
+  https://static.rust-lang.org/dist/rustc-1.94.1-src.tar.xz.sha256 \
+  -o "$rust_sha_file" || exit 1
+
+rust_sha="$(awk 'NR==1 {print $1}' "$rust_sha_file")"
+rm -f "$rust_sha_file"
+
+if ! [[ "$rust_sha" =~ ^[0-9a-fA-F]{64}$ ]]; then
+    echo "无法取得有效的 Rust 1.94.1 SHA256"
+    exit 1
+fi
+
+sed -i \
+  -e 's/^PKG_VERSION:=.*/PKG_VERSION:=1.94.1/' \
+  -e 's/^PKG_RELEASE:=.*/PKG_RELEASE:=1/' \
+  -e "s/^PKG_HASH:=.*/PKG_HASH:=$rust_sha/" \
+  feeds/packages/lang/rust/Makefile
+
+grep -E '^PKG_(VERSION|RELEASE|HASH):=' \
+  feeds/packages/lang/rust/Makefile
