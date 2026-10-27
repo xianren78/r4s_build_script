@@ -30,15 +30,13 @@ mkdir -p feeds/packages/kernel/ovpn-dco/patches
 curl -s $mirror/openwrt/patch/packages-patches/ovpn-dco/Makefile > feeds/packages/kernel/ovpn-dco/Makefile
 curl -s $mirror/openwrt/patch/packages-patches/ovpn-dco/patches/001-fix-linux-6.18.patch > feeds/packages/kernel/ovpn-dco/patches/001-fix-linux-6.18.patch
 
-# libpfring
+# libpfring 9.2.0 lede
 rm -rf feeds/packages/libs/libpfring
 mkdir -p feeds/packages/libs/libpfring/patches
-curl -s $mirror/openwrt/patch/packages-patches/libpfring/Makefile > feeds/packages/libs/libpfring/Makefile
+curl -s https://github.com/coolsnowwolf/packages/raw/refs/heads/master/libs/libpfring/Makefile > feeds/packages/libs/libpfring/Makefile
 pushd feeds/packages/libs/libpfring/patches
-  curl -Os $mirror/openwrt/patch/packages-patches/libpfring/patches/0001-fix-cross-compiling.patch
-  curl -Os $mirror/openwrt/patch/packages-patches/libpfring/patches/100-fix-compilation-warning.patch
-  curl -Os $mirror/openwrt/patch/packages-patches/libpfring/patches/900-fix-linux-6.6.patch
-  curl -Os $mirror/openwrt/patch/packages-patches/libpfring/patches/901-fix-build-for-linux-6.17.patch
+  curl -Os https://github.com/coolsnowwolf/packages/raw/refs/heads/master/libs/libpfring/patches/0001-fix-cross-compiling.patch
+  curl -Os https://github.com/coolsnowwolf/packages/raw/refs/heads/master/libs/libpfring/patches/0002-fix-linux-6.18-support.patch
 popd
 
 # nat46
